@@ -30,18 +30,25 @@ pygame.clock = pygame.time.Clock()
 colors = ["red", "yellow", "blue", "green", "orange", "purple", "brown", "pink", "sky blue"]
 orientations = ["up","down","left","right"] * 3
 
-player_grid = Grid((scrx/2,scry - 150))
-comp_grid1 = Grid((scrx/3,125))
-comp_grid2 = Grid((2 * scrx/3,125))
+player_grid = Grid((scrx/2,scry - 130))
+# comp_grid1 = Grid((scrx/3,125), 'white')
+# comp_grid2 = Grid((2 * scrx/3,125), 'black')
 
+
+comp_grid1 = generateGrid(pygame.nres, (scrx/3,125), 'white')
+comp_grid2 = generateGrid(pygame.nres, (2 * scrx/3,125), 'black')
 
 
 # structures are grids with the black/white/no circle
 structures = dict()
 
-for i in ({player_grid: 'blank'}, {comp_grid1: 'blank'}, {comp_grid2: 'blank'}):
+for i in (
+    {player_grid: 'blank'}, 
+    # {comp_grid1: 'blank'}, 
+    # {comp_grid2: 'blank'}, 
+    {new_grid: 'blank'}):
     structures.update(i)
-print(structures)
+
 
 
 for i in range(len(colors)):
@@ -49,11 +56,14 @@ for i in range(len(colors)):
 # player_grid.update(4, Triangle('green', 'down').triItem())
 # player_grid.update(6, Triangle('sky blue', 'left').triItem())
 
-for i in range(len(colors)):
-    comp_grid1.update(i, Triangle(colors[i], orientations[i]).triItem())
+# for i in range(len(colors)):
+#     comp_grid1.update(i, Triangle(colors[i], orientations[i]).triItem())
 
-for i in range(len(colors)):
-    comp_grid2.update(i, Rectangle(colors[-i]).rectItem())
+# for i in range(len(colors)):
+#     comp_grid2.update(i, Rectangle(colors[-i]).rectItem())
+
+
+
 
 
 

@@ -73,7 +73,7 @@ class Triangle():
         # can still optimize the orientation code
         self.points = tri_orient(self.orientation, self.center, self.size)
 
-    def render(self):       # will only be used for rendering the shape by itself
+    def render(self,surf):       # will only be used for rendering the shape by itself
         pygame.draw.polygon(surf, self.color, self.points)
 
     def triItem(self):

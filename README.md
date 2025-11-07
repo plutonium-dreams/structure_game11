@@ -31,11 +31,11 @@
     [/] be able to insert the shapes on each cell individually
 [ ] create the layout of the game
     [ ] finalize placement of each grid
-    [ ] test out each the shapes on each grid
+    [/] test out each the shapes on each grid
     [ ] create spaces for the black and white stones (circles) for judging
 [ ] implement the game loop
     [ ] implement the preliminaries
-        [ ] implement the secret rule thingy
+        [/] implement the secret rule thingy
             [ ] make a list/dictionary of options for the secret rule
             [ ] randomly select the secret rule
         [ ] implement the computer generated structures that follow the secret rule

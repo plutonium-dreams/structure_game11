@@ -17,6 +17,8 @@ to do:
     - for each attribute, make a collection of all of their possibilities
     - randomly pull an item from each attribute collection and put it in the secret rule list
     - print out the secret rule list
+
+# can turn this whole thing into a class
 '''
 
 import pygame, random
@@ -26,13 +28,14 @@ from grid import *
 
 secret_rule = []    # secret rule is a string (list will be turned into a string later)
 
-# attributes
-quantity = [0,1,2,3, 'any']
-color = ['red', 'blue', 'yellow', 'any']
-orientation = ['up', 'down', 'left', 'right', 'any']
-shape = ['rectangle','triangle', 'any']
+# important collections
 
-attributes = [quantity, color, orientation, shape]
+attributes = {
+    'shape': ['rectangle','triangle', 'any'],
+    'quantity': [0,1,2,3, 'any'],
+    'color': ['red', 'blue', 'yellow', 'any'],
+    'orientation': ['up', 'down', 'left', 'right', 'any'],
+}
 
 # interactions
 def adjacent(shape_1, shape_2):
@@ -50,33 +53,26 @@ def pointing(shape):
 interactions = ['adjacent', 'pointing']
 
 
-
-
 # secret rule generator
-def srule_gen(amt):
+def generateSecretRule():
     global attributes, interactions
     rule1 = list()
     rule2 = list()
-    ineract = None
     
-    secret_rule = [rule1, rule2, ineract]
+    secret_rule = [rule1, rule2]        # can be turned into a dictionary 
     
-    for num in range(amt):
-        for i in range(2):
-            for j in range(len(attributes)):
-                # gaka list index out of range; collections of attribute possibilitoies dont have the same length
-                attr = attributes[j][random.randint(0,len(attributes)-1)]
+    for i in range(random.randint(1,2)):
+        for j in attributes:
+            try:
+                attr = attributes[j][random.randint(0,len(attributes[j])-1)]
                 secret_rule[i].append(attr)
-            # fix interactions to only have 1 string allowed at secret_rule[2]
-            
-        ineract = interactions[1]
+            except IndexError:
+                pass
+                
+    
+    if secret_rule[1]:
+        secret_rule.append(interactions[random.randint(0,len(interactions)-1)])
 
-    print(secret_rule)
-
-
-srule_gen(1)
-
-
-
+    return secret_rule
 
 
