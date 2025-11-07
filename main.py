@@ -4,13 +4,12 @@ Zendo-inspired game for Math 153 final project
 dev notes here for
 
 '''
-
-
-import sys
-import pygame
+import sys, pygame
 
 from shapes import *
 from grid import *
+
+
 
 ''' initialize '''
 scrx, scry = 640, 480
@@ -22,6 +21,8 @@ pygame.window = pygame.display.set_mode((scrx, scry))
 #pygame.nres = pygame.Surface(((1)* scrx * (3 / 4), (1)*scry * (3/4)))
 pygame.nres = pygame.Surface((scrx, scry))
 pygame.clock = pygame.time.Clock()
+
+
 
 ''' vars / funcs '''
 
@@ -43,7 +44,6 @@ for i in ({player_grid: 'blank'}, {comp_grid1: 'blank'}, {comp_grid2: 'blank'}):
 print(structures)
 
 
-
 for i in range(len(colors)):
     player_grid.update(i, Rectangle(colors[i]).rectItem())
 # player_grid.update(4, Triangle('green', 'down').triItem())
@@ -54,6 +54,8 @@ for i in range(len(colors)):
 
 for i in range(len(colors)):
     comp_grid2.update(i, Rectangle(colors[-i]).rectItem())
+
+
 
 
 ''' game loop '''
