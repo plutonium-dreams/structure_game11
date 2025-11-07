@@ -14,12 +14,12 @@ from grid import *
 def touching(shape_1, shape_2):
     pass
 
-def grounded(shape):
-    pass
+# def grounded(shape):
+#     pass
 
-def pointing(shape):
-    pass
+# def pointing(shape):
+#     pass
 
-def on_top(shape_above, shape_below):
-    pass
+# def on_top(shape_above, shape_below):
+#     pass
 

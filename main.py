@@ -24,8 +24,6 @@ pygame.nres = pygame.Surface((scrx, scry))
 pygame.clock = pygame.time.Clock()
 
 ''' vars / funcs '''
-structures = {'a'}
-print(structures)
 
 # testing setup
 colors = ["red", "yellow", "blue", "green", "orange", "purple", "brown", "pink", "sky blue"]
@@ -34,6 +32,17 @@ orientations = ["up","down","left","right"] * 3
 player_grid = Grid((scrx/2,scry - 150))
 comp_grid1 = Grid((scrx/3,125))
 comp_grid2 = Grid((2 * scrx/3,125))
+
+
+
+# structures are grids with the black/white/no circle
+structures = dict()
+
+for i in ({player_grid: 'blank'}, {comp_grid1: 'blank'}, {comp_grid2: 'blank'}):
+    structures.update(i)
+print(structures)
+
+
 
 for i in range(len(colors)):
     player_grid.update(i, Rectangle(colors[i]).rectItem())
@@ -50,29 +59,15 @@ for i in range(len(colors)):
 ''' game loop '''
 def game():
     while True:
+        ''' updating '''
+        
+        ''' rendering '''
         pygame.nres.fill(("dark gray"))
+        
+        for struc in structures:
+            struc.render(pygame.nres)
 
-        # playing around
-        for cell in range(9):
-            try:
-                player_grid.swap(cell, cell + 1)
-                comp_grid1.swap(cell, cell + 1)
-                comp_grid2.swap(cell, cell+1)
-            except IndexError:
-                pass
-            
-            
-        player_grid.render(pygame.nres)
-        comp_grid1.render(pygame.nres)
-        comp_grid2.render(pygame.nres)
-
-
-
-        for i in range(3):
-            for j in range(3):
-                pygame.draw.circle(pygame.nres, 'white', ((scrx/2)+ ((i-1) * 50), (scry - 150)+ ((j-1) * 50)), 5) 
-
-
+        ''' event handling '''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()   
@@ -83,8 +78,10 @@ def game():
                 if event.key == pygame.K_t:
                     pass
 
-        pygame.window.blit(pygame.transform.scale(pygame.nres, pygame.window.get_size()), (0,0))
+
+        ''' technical shi '''
+        pygame.window.blit(pygame.transform.scale(pygame.nres, pygame.window.get_size()), (0,0))    # blits nres to window
         pygame.display.update()
-        pygame.clock.tick(1)
+        pygame.clock.tick(60)
 
 game()
