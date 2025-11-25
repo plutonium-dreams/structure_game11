@@ -35,7 +35,7 @@ class Rectangle():
         self.size = (50,50)
         self.color = color
         self.type = 'rectangle'
-        self.orientation = 'up'
+        self.orientation = 'any'
 
         self.rect = pygame.Rect(self.pos, self.size)
 

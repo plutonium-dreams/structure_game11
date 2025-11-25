@@ -1,98 +1,136 @@
 '''
-grid - cell testing
-
-# parameters
-cell = an integer from 0 to 8 designating a position on the 3x3 grid
-item = [shape, color, orientation]
-
-# to do
-- Grid /
-- Shapes /
-- Transition to Pygame / 
-
+Grid module
 '''
-import pygame
-from shapes import *
-from secret_rules import *
+from rule import *
+from shape import *
 
-pygame.init()
+class Grid:
+    def __init__(self, pos):
+        self.grid = [
+            [], [], [],
+            [], [], [],
+            [], [], []
+            ]
+        self.pos = pos
+        self.center = (pos[0] - 192/2, pos[1] - 192/2)
 
-class Grid():
-    def __init__(self, pos, token=None):
-        self.size = (150,150)       # default (150, 150)
-        self.grid = [[], [], [],
-                     [], [], [],
-                     [], [], []]
-        self.pos = (pos[0] - self.size[0] / 2, pos[1] - self.size[1] / 2)
-        self.center = pos
-        self.token = token
 
     def __str__(self):
-        # print(self.grid)
         for i in range(len(self.grid)):
             print(self.grid[i], end='')
             if (i+1) % 3 == 0:
-                print('')
-
-            
+                print()
+        
         return ''
 
+    def render(self, surf):            # can be optimized more
+        cell = 0
+        for i in range(3):
+            for j in range(3):
+                if self.grid[cell] != []:
+                    shape = Shape(self.grid[cell][0], self.grid[cell][1])
+                    shape.render(surf, (self.center[0] + (shape.image.width * j), self.center[1] + (shape.image.height * i)))
 
+                cell += 1
+    
     def update(self, cell, item):    
+        # shp = Shape(*item)
         if self.grid[cell] == []:
             self.grid[cell] = item
+            return 1
         else:
-            print('\nAn item already exists in the cell!\n')
+            # print('\nAn item already exists in the cell!\n')
+            return 0
 
     def swap(self, cell_1, cell_2):
         self.grid[cell_1], self.grid[cell_2] = self.grid[cell_2], self.grid[cell_1]
 
-    def render(self, surf):
-        k = 0
-        for i in range(3):
-            for j in range(3):
-                if self.grid[k] != []:
-                    # can be simplified into pygame.surf.blits if we have images of the rectangle and triangle instead
-                    
-                    if self.grid[k][0] == 'rectangle':
-                        pygame.draw.rect(surf, self.grid[k][1], ((self.pos[0] + (j * 50), self.pos[1] + (i * 50)), (self.size[0] / 3, self.size[1] / 3)))
-                        
-                    elif self.grid[k][0] == 'triangle':
-                        pygame.draw.polygon(surf, self.grid[k][1], tri_orient(self.grid[k][2], (self.center[0] + ((j-1) * 50), self.center[1] + ((i-1) * 50)), (self.size[0]/3,self.size[1]/3)))
+
+
+    def clear(self):
+            self.grid = [
+            [], [], [],
+            [], [], [],
+            [], [], []
+            ]
+
+    def checkGrid(self, srule):
+        # secret rule format
+        # [qty, color, shape]
+        qty = 0
+        for cell in self.grid:
+            try:
+                if cell[0] == srule[1] and cell[1] == srule[2]:
+                    qty += 1
+            except IndexError:
+                pass
+        
+        if qty == srule[0]:
+            return 1
+        
+        return 0
+
+    def genGrid(self, srule):
+        self.clear()
+        snum = [0, 0]
+
+        for i in range(len(self.grid)):
+            shp = random.randint(0,1)
+            if snum[shp] > 2:           
+                break
+
+            if self.update(random.randint(0,8), [attributes['color'][random.randint(0,2)], attributes['shape'][shp]]):
+                snum[shp] += 1
+            
+                # grid element
+                # ['color', 'shape']
+        
+        if self.checkGrid(srule):
+            return 1
+        else:
+            self.clear()
+            self.genGrid(srule)
+
+
+'''
+what should the player grid have?
+- be modifiable:
+    - player able to place down a piece
+    - if piece already exists, then replace it
+- be verifiable:
+    - have the computer check if the grid follows the secret rule
+'''
+
+class PlayerGrid(Grid):
+    def __init__(self, pos):
+        super().__init__(pos)
+        self.cursor = pygame.image.load(os.path.join('assets', 'cursor.png'))
+        self.curs_pos = [0,0]
+        self.cell_pos = 0 
+            
+    def place(self, color, tipe):
+        self.grid[self.cell_pos] = [color, tipe]
+    
+    def playerUpdate(self, surf, inp):
+        # checks if the player moved or placed a piece; or verified a grid
+        self.curs_pos = inp
+        self.cell_pos = (self.curs_pos[0]) + (self.curs_pos[1] * 3) 
+        
+        surf.blit(self.cursor, (self.center[0] + (64 * self.curs_pos[0]), self.center[1] + (64 * self.curs_pos[1])))
+    
+        
+
+
                 
-                k += 1
-    
-        if self.token:
-            pygame.draw.circle(surf, self.token, (self.center[0], self.center[1] + 2 * self.size[1]/3), (self.size[0]/6))
-    
-
-
-
-
-def genUpdate(grd, item):
-    cell = random.randint(0,8)
-    if grd.grid[cell] == []:
-        grd.grid[cell] = item
-    else:
-        return genUpdate(grd, item)
-
-def generateGrid(surf, pos, token=None):
-    grid = Grid(pos, token)
-
-    # generate shapes        
-    shapes = []
-
-    for typ in range(random.randint(1,3)):
-        for qty in range(random.randint(1,3)):
-            shp = random.randint(1,2) 
-            if shp == 2:
-                shapes.append(Triangle(attributes['color'][random.randint(0,2)], attributes['orientation'][random.randint(0,3)]).triItem())
-            elif shp == 1:
-                shapes.append(Rectangle(attributes['color'][random.randint(0,2)]).rectItem())
-
-    # place the shapes on the grid
-    for shape in shapes:
-        genUpdate(grid, shape)
         
-    return grid
-        
+# test code
+# grid = Grid()
+
+# srule = generateSecretRule()
+
+# grid.genGrid(srule)
+
+
+# print(srule)
+# print(grid)
+

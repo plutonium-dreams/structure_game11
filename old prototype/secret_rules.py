@@ -23,18 +23,15 @@ to do:
 
 import pygame, random
 from shapes import *
-from grid import *
 
-
-secret_rule = []    # secret rule is a string (list will be turned into a string later)
 
 # important collections
 
 attributes = {
-    'shape': ['rectangle','triangle', 'any'],
-    'quantity': [0,1,2,3, 'any'],
-    'color': ['red', 'blue', 'yellow', 'any'],
-    'orientation': ['up', 'down', 'left', 'right', 'any'],
+    'shape': ['rectangle','triangle'],
+    'color': ['red', 'blue','yellow'],
+    'orientation': ['up', 'down', 'left', 'right'],
+    'quantity': [0,1,2,3],
 }
 
 # interactions
@@ -63,16 +60,11 @@ def generateSecretRule():
     
     for i in range(random.randint(1,2)):
         for j in attributes:
-            try:
-                attr = attributes[j][random.randint(0,len(attributes[j])-1)]
-                secret_rule[i].append(attr)
-            except IndexError:
-                pass
+            attr = attributes[j][random.randint(0,len(attributes[j])-1)]
+            secret_rule[i].append(attr)
                 
     
     if secret_rule[1]:
         secret_rule.append(interactions[random.randint(0,len(interactions)-1)])
 
     return secret_rule
-
-
