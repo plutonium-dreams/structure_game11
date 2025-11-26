@@ -77,7 +77,7 @@ class Grid:
         for i in range(len(self.grid)):
             shp = random.randint(0,1)
             if snum[shp] > 2:           
-                break
+                continue
 
             if self.update(random.randint(0,8), [attributes['color'][random.randint(0,2)], attributes['shape'][shp]]):
                 snum[shp] += 1
@@ -92,14 +92,6 @@ class Grid:
             self.genGrid(srule)
 
 
-'''
-what should the player grid have?
-- be modifiable:
-    - player able to place down a piece
-    - if piece already exists, then replace it
-- be verifiable:
-    - have the computer check if the grid follows the secret rule
-'''
 
 class PlayerGrid(Grid):
     def __init__(self, pos):
@@ -113,6 +105,7 @@ class PlayerGrid(Grid):
     
     def playerUpdate(self, surf, inp):
         # checks if the player moved or placed a piece; or verified a grid
+        inp = [inp[0] % 3, inp[1] % 3]
         self.curs_pos = inp
         self.cell_pos = (self.curs_pos[0]) + (self.curs_pos[1] * 3) 
         
