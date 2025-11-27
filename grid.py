@@ -45,8 +45,6 @@ class Grid:
     def swap(self, cell_1, cell_2):
         self.grid[cell_1], self.grid[cell_2] = self.grid[cell_2], self.grid[cell_1]
 
-
-
     def clear(self):
             self.grid = [
             [], [], [],
