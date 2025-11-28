@@ -1,9 +1,6 @@
 '''
 Grid module
 '''
-import sys
-
-sys.setrecursionlimit(10**3)
 
 from rule import *
 from shape import *
@@ -17,21 +14,15 @@ class Grid:
             ]
         self.pos = pos
         self.center = (pos[0] - 192/2, pos[1] - 192/2)
-        self.neighbors = {
-                'north': [], 
-                'south': [], 
-                'west': [], 
-                'east': []
-                }
-
 
     def __str__(self):
         for i in range(len(self.grid)):
             print(self.grid[i], end='')
             if (i+1) % 3 == 0:
                 print()
-        
+
         return ''
+
 
     def render(self, surf):            # can be optimized more
         cell = 0
@@ -42,9 +33,8 @@ class Grid:
                     shape.render(surf, (self.center[0] + (shape.image.width * j), self.center[1] + (shape.image.height * i)))
 
                 cell += 1
-    
+
     def update(self, cell, item):    
-        # shp = Shape(*item)
         if self.grid[cell] == []:
             self.grid[cell] = item
             return 1
@@ -63,32 +53,21 @@ class Grid:
             ]
 
 
-
     def checkGrid(self, srule):
         # secret rule format
-        # [qty, color, shape, interaction type (#), <interaction>]
-
+        # [qty, color, shape]
         qty = 0
-        ind = 0
         for cell in self.grid:
             try:
                 if cell[0] == srule[1] and cell[1] == srule[2]:
                     qty += 1
             except IndexError:
                 pass
-        
+
         if qty == srule[0]:
-            # print('1111')
-            # print(srule)
-            # print(grid)
-            if srule[3] >= 1 and srule[0] != 0:
-                for cell in self.grid:
-                    if srule[4] in self.adjacent(ind).items():
-                        return 1
-        
+            return 1
+
         return 0
-
-
 
     def genGrid(self, srule):
         self.clear()
@@ -101,67 +80,15 @@ class Grid:
 
             if self.update(random.randint(0,8), [attributes['color'][random.randint(0,2)], attributes['shape'][shp]]):
                 snum[shp] += 1
-            
+                
                 # grid element
                 # ['color', 'shape']
-        
+
         if self.checkGrid(srule):
             return 1
         else:
             self.clear()
             self.genGrid(srule)
-
-
-
-    def adjacent(self, cell, shape=None):       # can be optimized 10000x more but i cant figure it out for the life of me
-        self.neighbors.update({
-                'north': self.grid[cell-3],
-                'west': self.grid[cell-1], 
-                })
-
-        if cell > 5:
-            self.neighbors['south'] = []
-            
-            if cell == 6:
-                self.neighbors['east'] = self.grid[cell+1]
-                self.neighbors['west'] = []
-            if cell == 7:
-                self.neighbors['east'] = self.grid[cell+1]
-            if cell == 8:
-                self.neighbors['east'] = []
-            
-
-
-        else:
-            self.neighbors = {
-                'north': self.grid[cell-3], 
-                'south': self.grid[cell+3], 
-                'west': self.grid[cell-1], 
-                'east': self.grid[cell+1]
-                }
-
-            if cell < 3:
-                self.neighbors['north'] = []
-            
-            for i in range(3):
-                if cell == 0 + (3*i):
-                    self.neighbors['west'] = []
-                if cell == 2 + (3*i):
-                    self.neighbors['east'] = []
-
-        # if shape:
-        #     # print(self.neighbors)
-        #     for i in self.neighbors:
-        #         if self.neighbors[i] == shape:
-        #             print(self.neighbors)
-        #             return i, self.neighbors[i]
-            
-        #     return self.neighbors
-
-        return self.neighbors
-
-        
-        
 
 
 
@@ -171,46 +98,20 @@ class PlayerGrid(Grid):
         self.cursor = pygame.image.load(os.path.join('assets', 'cursor.png'))
         self.curs_pos = [0,0]
         self.cell_pos = 0 
-            
+
     def place(self, color, tipe):
         if self.grid[self.cell_pos] == [color, tipe]:
             self.grid[self.cell_pos] = []
         else:
             self.grid[self.cell_pos] = [color, tipe]
-    
+
     def playerUpdate(self, surf, inp):
         # checks if the player moved or placed a piece; or verified a grid
         inp = [inp[0] % 3, inp[1] % 3]
         self.curs_pos = inp
         self.cell_pos = (self.curs_pos[0]) + (self.curs_pos[1] * 3) 
-        
+
         surf.blit(self.cursor, (self.center[0] + (64 * self.curs_pos[0]), self.center[1] + (64 * self.curs_pos[1])))
-    
-    
-srule = generateSecretRule(2)        
-grid = Grid((100,190))
-grid.genGrid(srule)
-
-print(grid)
-
-print(srule)
-# print()
-# print(grid.adjacent(7)) 
-# print()
-# test code
 
 
-
-                
-        
-# test code
-# grid = Grid()
-
-# srule = generateSecretRule()
-
-# grid.genGrid(srule)
-
-
-# print(srule)
-# print(grid)
-
+# grid_1 = Grid((400,400)).genGrid(generateSecretRule())
