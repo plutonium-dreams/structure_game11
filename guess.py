@@ -3,19 +3,11 @@ Guessing module
 
 '''
 import pygame, os
+from utils import *
 from shape import *
 from rule import *
 
 pygame.init()
-
-
-# make a single python file compiling this cursor thing and attributes, etc other things needed by all modules
-text = pygame.font.SysFont('comic_sans',20)
-button = pygame.font.SysFont('comic_sans',36)
-scrx, scry = 720, 480
-
-
-
 
 guess_window = pygame.Surface((360, 240))
 
