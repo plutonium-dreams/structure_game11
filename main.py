@@ -17,8 +17,9 @@ To do list:
 [/] player grid verification
 [/] guessing mechanic
 [/] make the game restart with points for each won round
-[ ] add a delete button for the structure creation
+[/] add a delete button for the structure creation
 [ ] add the interaction rules
+[ ] make a button class
 [ ] game polishing
     - make the computer present one correct and one wrong structure
     - add more rules, possible variation
@@ -48,12 +49,8 @@ pygame.display.set_caption('Deduction (working title)')
 window = pygame.display.set_mode((scrx, scry))
 pygame.clock = pygame.time.Clock()
 
-guess_window = pygame.Surface((360, 240))
-
 text = pygame.font.SysFont('comic_sans',20)
 button = pygame.font.SysFont('comic_sans',36)
-
-cursor = pygame.image.load(os.path.join('assets', 'cursor.png'))
 
 ''' game stuff '''
 grid_1 = Grid((scrx/4, 128))
@@ -68,10 +65,10 @@ def newGame():
     global secret_rule
     global fake_rule
 
-    secret_rule = generateSecretRule()
-    fake_rule = generateSecretRule()
+    secret_rule = generateSecretRule('easy')
+    fake_rule = generateSecretRule('easy')
     while fake_rule == secret_rule:
-        fake_rule = generateSecretRule()
+        fake_rule = generateSecretRule('easy')
 
     grid_1.genGrid(secret_rule)
     grid_2.genGrid(fake_rule)
@@ -91,11 +88,10 @@ newGame()
 
 
 # defaults
-inp = [0,0]     # input cursor
+inp = [0,0,0,0,0]     # input cursor
 clr = 0         # color of piece in hand
 shp = 0         # shape of piece in hand
 cooldown = 10   # mouse click cooldown
-guess_amt = 0   # guess for the amount
 verifies = 0    # number if correct verifies
 correct_verifies = 0    # verify pass
 wins = 0    # number of wins
@@ -103,11 +99,11 @@ draw_guess = False      # guessing screen status
 
 ''' testing stuff '''
 
-
+print(grid_1.adjacent(3))
 
 while True:
     if not draw_guess:
-        hand = Shape(attributes['color'][clr % 3], attributes['shape'][shp % 2])
+        hand = Shape(attributes['color'][inp[2] % 3], attributes['shape'][inp[3] % 2])
 
 
     ''' rendering '''
@@ -149,30 +145,11 @@ while True:
 
     # for the guessing mechanic
     if draw_guess and correct_verifies > 0:
-        guess_num = -inp[1] % 4
-        guess_shape = Shape(attributes['color'][clr % 3], attributes['shape'][shp % 2])
-
-        guess_window.fill('black')
-        pygame.draw.rect(guess_window, 'dark gray', ((16,16), (360-32, 240-32)))
-
-        guess_window.blit(text.render('Amount', 0, 'black'), (64,32))
-        guess_window.blit(text.render('Shape and Color', 0, 'black'), (128+32,32))
-
-
-        guess_window.blit(text.render(f'{guess_num}', 0, 'black'), (64+16,64+16))
-        guess_shape.render(guess_window, (128+16+32,64+16))
-        
-
-        guess = [guess_num, attributes['color'][clr % 3], attributes['shape'][shp % 2]]
-        # print(guess, secret_rule)
-
-
-        window.blit(guess_window, (scrx/4, scry/4))
-           
+        gss = guess(window, inp)
+    
+        # print(gss, secret_rule)
 
     cooldown -= 1
-
-    
 
     ''' event handling '''
 
@@ -185,7 +162,11 @@ while True:
             if event.button == 1 and cooldown <= 0:
                 if guess_button.collidepoint((pygame.mouse.get_pos())) and not draw_guess and correct_verifies > 0:
                     draw_guess = True
+                    clr = inp[2]
+                    shp = inp[3]
                 else:
+                    inp[2] = clr
+                    inp[3] = shp
                     draw_guess = False
 
             cooldown = 10
@@ -204,9 +185,9 @@ while True:
             if event.key == pygame.K_SPACE:
                 player.place(hand.color, hand.type)
             if event.key == pygame.K_j:
-                clr += 1
+                inp[2] += 1
             if event.key == pygame.K_k:
-                shp += 1
+                inp[3] += 1
             if event.key == pygame.K_RETURN:
                 if not draw_guess:
                     verifies += 1
@@ -214,11 +195,13 @@ while True:
                         correct_verifies += 1
                 
                 if draw_guess:
-                    if guess == secret_rule:
+                    if gss == secret_rule:
                         wins += 1
                         verifies = 0
                         newGame()
                     
+                    inp[2] = clr
+                    inp[3] = shp
                     correct_verifies -= 1
                     draw_guess = False
                 
@@ -229,6 +212,8 @@ while True:
             if event.key == pygame.K_TAB:
                 if not draw_guess and correct_verifies > 0:
                     draw_guess = True
+                    clr = inp[2]
+                    shp = inp[3]
                 else:
                     draw_guess = False
 
