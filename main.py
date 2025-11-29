@@ -21,8 +21,9 @@ To do list:
 [/] add a delete button for the structure creation
 [/] make a button class
 [/] add a main menu
-[ ] add a timer function
+[/] add a timer function
 [ ] add a high score system
+[ ] polish the timer system
 [ ] game polishing
     - make the computer present one correct and one wrong structure
     - add more rules, possible variation
@@ -38,7 +39,7 @@ from defaults import *
 from grid import *
 from rule import *
 from shape import *
-from guess import *
+from popup import *
 
 
 
@@ -64,8 +65,8 @@ player = PlayerGrid((center[0], scry - (scry/4)))
 
 # random shi
 
-pygame.mixer.music.load(os.path.join('assets', 'funk.mp3'))
-pygame.mixer.music.set_volume(0.4)
+pygame.mixer.music.load(os.path.join('assets', 'sad.mp3'))
+pygame.mixer.music.set_volume(0.2)
 
 
 ''' global functions '''
@@ -83,7 +84,8 @@ def newGame():
 
     grid_1.genGrid(secret_rule)
     grid_2.genGrid(fake_rule)
-    while grid_2.checkGrid(secret_rule):       # needs to be more efficient so that grid 2 can never accidentally follow the secret rule even when its following the fake rule
+    if grid_2.checkGrid(secret_rule):       # needs to be more efficient so that grid 2 can never accidentally follow the secret rule even when its following the fake rule
+        grid_1.genGrid(fake_rule)
         grid_2.genGrid(fake_rule)
 
 
@@ -150,14 +152,23 @@ def game():
     global wins
     global draw_guess
     global hand
+    timer = Timer((0, center[1]-32), 1)     # put in utils soon
+
+    # background testing
+    bg = pygame.image.load(os.path.join('assets', 'bg1.png'))
+    bg = pygame.transform.hsl(bg, hue=-230, saturation=-0.2, lightness=0.1)
+    # bg = pygame.transform.invert(bg)
+    bg = pygame.transform.box_blur(bg, 10)
+    bg = pygame.transform.smoothscale(bg, (scrx, scry))
+    
     
     newGame()   
-    pygame.mixer.music.play()
+    # pygame.mixer.music.play()
     while True:
         
         ''' rendering '''
-        window.fill(('gray'))
-        
+        window.blit(bg, (0,0))
+        timer.render(window)
         # computer 
         grid_1.render(window)
         grid_2.render(window)
@@ -191,6 +202,7 @@ def game():
         # guess_button.image = pygame.transform.hsl(guess_button.image, hue=-120, saturation=-1, lightness=0)
         guess_button.render(window, correct_verifies)
 
+        
 
         ''' logic '''
         if correct_verifies:
@@ -203,6 +215,12 @@ def game():
             player.playerUpdate(window, inp)
             hand = Shape(attributes['color'][clr % 3], attributes['shape'][shp % 2])
 
+        if timer.duration <= 0:
+            # make an exit function for this
+            default()
+            pygame.mixer.music.stop()
+            guess_button.status = False
+            return menu()
 
         ''' event handling '''
 
@@ -250,6 +268,8 @@ def game():
                         if gss == secret_rule:
                             wins += 1
                             verifies = 0
+                            timer.velocity += 0.1
+                            timer.reset()
                             newGame()
                             player.clear()
                         
@@ -258,7 +278,7 @@ def game():
                     
                     
                 if event.key == pygame.K_BACKSPACE:
-                    if not correct_verifies:
+                    if not guess_button.status:
                         player.clear()
 
                 if event.key == pygame.K_TAB:
@@ -271,6 +291,8 @@ def game():
 
                 if event.key == pygame.K_ESCAPE:
                     pygame.mixer.music.stop()
+                    correct_verifies = False
+                    guess_button.status = False
                     return menu()
                         
 

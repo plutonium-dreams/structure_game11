@@ -88,7 +88,7 @@ class Grid:
             return 1
         else:
             self.clear()
-            self.genGrid(srule)
+            return self.genGrid(srule)
 
 
 
