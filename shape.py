@@ -11,7 +11,7 @@ class Shape():
     def __init__(self, color, tipe):
         self.color = color
         self.type = tipe
-        self.image = pygame.image.load(os.path.join('assets', '.'.join([f'{color}_{tipe}', 'png'])))
+        self.image = pygame.image.load(os.path.join('assets', 'images', '.'.join([f'{color}_{tipe}', 'png'])))
 
         self.pos = (0,0)
 

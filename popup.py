@@ -14,7 +14,7 @@ guess_window = pygame.Surface((360, 240))
 def guess(surf, inp):
     guess_num = -inp[1] % 4
 
-    guess_shape = Shape(attributes['color'][(2 + inp[2]) % 3], attributes['shape'][(2 + inp[3]) % 2])
+    guess_shape = Shape(attributes['color'][(inp[2]) % 3], attributes['shape'][(inp[3]) % 2])
 
     guess_window.fill('black')
     pygame.draw.rect(guess_window, 'dark gray', ((16,16), (360-32, 240-32)))
@@ -59,4 +59,91 @@ class Timer():
         if not self.duration <= 0:
             pygame.draw.rect(surf, 'dark gray', ((self.pos_1[0]+1, self.pos_1[1]), (self.duration, 64)))
             pygame.draw.rect(surf, 'dark gray', ((self.pos_2[0]-1, self.pos_2[1]), (self.duration, 64)))
+
+'''
+- make a name input thing in the main menu before the player starts a game
+- place a high score table in the main menu
+- pair the name inputted and the high score to place in the high score table
+'''
+
+
+
+class NameInput():
+    def __init__(self, pos, highscores):
+        self.pos = pos
+        self.name = 'XYZ'
+
+        self.highscores = highscores
+        
+        self.button_A = Button(pos, 'button.png', (64, 64))
+        self.button_B = Button((pos[0]+64, pos[1]), 'button.png', (64, 64))
+        self.button_C = Button((pos[0]+128, pos[1]), 'button.png', (64, 64))
+        self.buttons = [self.button_A, self.button_B, self.button_C]
+
+        self.A = 0
+        self.B = 0
+        self.C = 0
+
+        self.state = [0,0,0]
+
+        
+    def update(self):
+        self.state = [(self.A % 26) + 65, (self.B % 26) + 65, (self.C % 26) + 65]
+
+        for button in self.buttons:
+            button.update()
+
+        if self.button_A.status:
+            self.A += 1
+            self.button_A.status = False
+        if self.button_B.status:
+            self.B += 1
+            self.button_B.status = False
+        if self.button_C.status:
+            self.C += 1
+            self.button_C.status = False
+
+        # print(self.state)
+    
+    def sort_highscores(self):
+        sort = []
+        for score in self.highscores:
+            if int(score[4:score.find('\n')]) >= 100:
+                sort.append(score)
+        for score in self.highscores:
+            if 10 <= int(score[4:score.find('\n')]) < 100:
+                sort.append(score)
+            self.highscores.sort(reverse=True, key=sort_s)
+        for score in self.highscores:
+            if 1 <= int(score[4:score.find('\n')]) < 10:
+                sort.append(score)
+            self.highscores.sort(reverse=True, key=sort_s)
+        return sort
+
+
+    def render(self, surf):
+        for button in self.buttons:
+            button.render(surf, True)
+        
+        for i in range(len(self.state)):
+            surf.blit(nametext.render(chr(self.state[i]), 0, 'black'), (32 + self.pos[0] + 64 * i, self.pos[1]-32-16))
+
+        for i in range(5):
+            try:
+                score = nametext.render(self.sort_highscores()[i], 0, 'black')
+            except IndexError:
+                score = nametext.render('-------', 0, 'black')
+            surf.blit(score, (self.pos[0]+64, (self.pos[1]-224) + 32*i))
+        
+        surf.blit(nametext.render('High Scores',0,'gold', bgcolor='black'), (self.pos[0]+48, self.pos[1]-272))
+        # print(self.highscores)
+        # print(self.sort_highscores())
+
+    def savename(self):
+        name = ''
+        for i in self.state:
+            name += chr(i)
+        
+        return name
+        
 

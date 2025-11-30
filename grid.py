@@ -95,7 +95,7 @@ class Grid:
 class PlayerGrid(Grid):
     def __init__(self, pos):
         super().__init__(pos)
-        self.cursor = pygame.image.load(os.path.join('assets', 'cursor.png'))
+        self.cursor = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
         self.curs_pos = [0,0]
         self.cell_pos = 0 
 
