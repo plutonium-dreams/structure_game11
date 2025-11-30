@@ -164,9 +164,9 @@ def game():
 
     # background testing
     bg = pygame.image.load(os.path.join('assets', 'images', 'bg1.png'))
-    bg = pygame.transform.hsl(bg, hue=-230, saturation=-0.2, lightness=0.1)
-    # bg = pygame.transform.invert(bg)
-    bg = pygame.transform.box_blur(bg, 10)
+    # bg = pygame.transform.hsl(bg, hue=-230, saturation=-0.2, lightness=0.1)
+    # # bg = pygame.transform.invert(bg)
+    # bg = pygame.transform.box_blur(bg, 10)
     bg = pygame.transform.smoothscale(bg, (scrx, scry))
     
     newGame()
@@ -180,8 +180,8 @@ def game():
     while True:
         
         ''' rendering '''
-        # window.blit(bg, (0,0))
-        window.fill('gray')
+        window.blit(bg, (0,0))
+        # window.fill('gray')
 
         timer.render(window)
         # computer 
