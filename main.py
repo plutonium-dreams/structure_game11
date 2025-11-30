@@ -140,6 +140,10 @@ def menu():
                     inp[0] += 1
                 if event.key == pygame.K_a:
                     inp[0] -= 1
+                if event.key == pygame.K_RETURN:
+                    start_button.status = False
+                    name = nameinput.savename()
+                    return game()
 
         pygame.display.update()
         pygame.clock.tick(60)

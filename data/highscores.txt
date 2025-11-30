@@ -1,1 +1,6 @@
-KNB:4
+KNB:9
+AAA:4
+XYZ:14
+GGY:7
+PTO:3
+MNQ:7
