@@ -1,0 +1,49 @@
+To do list:
+
+1. game
+[ ] make a pause button
+[ ] bug fixing
+    [ ] figure out why the default function aint working
+
+2. Make the documentation
+[ ] main.py
+[ ] grid.py
+[ ] shape.py
+[ ] rule.py
+[ ] defaults.py
+[ ] utils.py
+
+
+
+3. Make the assets of the following:
+[ ] Background of Title screen
+[ ] Back ground of the game
+[ ] Music for the game
+    [ ] wins
+    [ ] lose
+    [ ] correct guess
+    [ ] incorrect guess
+    [ ] valid structure
+    [ ] invalid structure
+    [ ] start game
+    [ ] new high score
+[ ] Shapes
+[ ] Buttons
+[ ] Text
+[ ] Title screen
+[ ] Highscores board
+
+
+3. Game manual
+
+4. PPT
+
+
+What to finish today:
+- Final project progress report
+- Assets of the Shapes
+- Button assets
+- Playtesting
+
+
+

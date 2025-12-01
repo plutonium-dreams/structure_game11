@@ -49,7 +49,7 @@ from popup import *
 ''' initialize '''
 pygame.init()
 
-pygame.display.set_caption('Deduction (working title)')
+pygame.display.set_caption('Arki (working prototype)')
 window = pygame.display.set_mode((scrx, scry))
 pygame.clock = pygame.time.Clock()
 
@@ -84,6 +84,11 @@ def newGame():
     if grid_2.checkGrid(secret_rule):       # needs to be more efficient so that grid 2 can never accidentally follow the secret rule even when its following the fake rule
         grid_1.genGrid(secret_rule)
         grid_2.genGrid(fake_rule)
+
+    player.clear()
+    verifies = 0
+    correct_verifies = False
+    draw_guess = False
 
 
     print(f'Secret Rule: {secret_rule}')
@@ -170,7 +175,6 @@ def game():
     bg = pygame.transform.smoothscale(bg, (scrx, scry))
     
     newGame()
-    default()
 
     # pygame.mixer.music.load(os.path.join('assets', 'audios', 'country.mp3'))
     # pygame.mixer.music.play()
@@ -229,6 +233,7 @@ def game():
             player.playerUpdate(window, inp)
             hand = Shape(attributes['color'][inp[2] % 3], attributes['shape'][inp[3] % 2])
 
+        # timer
         if timer.duration <= 0:
             # make an exit function for this
             default()
