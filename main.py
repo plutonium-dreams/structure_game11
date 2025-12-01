@@ -85,10 +85,15 @@ def newGame():
         grid_1.genGrid(secret_rule)
         grid_2.genGrid(fake_rule)
 
+        if grid_2.checkGrid(secret_rule):
+            grid_1.genGrid(secret_rule)
+            grid_2.genGrid(fake_rule)
+
     player.clear()
     verifies = 0
     correct_verifies = False
     draw_guess = False
+    timer.reset()
 
 
     print(f'Secret Rule: {secret_rule}')
@@ -112,7 +117,7 @@ def menu():
     title = pygame.transform.scale_by(title, 9/10)
 
     highscores = read_highscore()
-    nameinput = NameInput((center[0]+128+16, center[1]+128), highscores)
+    nameinput = Highscore((center[0]+128+16, center[1]+128), highscores)
     
     while True:
         window.fill(('gray'))
@@ -164,30 +169,39 @@ def game():
     global correct_verifies
     global wins
     global draw_guess
+    global paused
     global hand
-    timer = Timer((0, center[1]-32), 1)     # put in utils soon
+
+    wins = 0
+    inp = [0,0,0,0,0]
+    player.clear()
+    verifies = 0
+    correct_verifies = False
+    draw_guess = False
+    guess_button.status = False
+    timer.reset()
 
     # background testing
     bg = pygame.image.load(os.path.join('assets', 'images', 'bg1.png'))
-    # bg = pygame.transform.hsl(bg, hue=-230, saturation=-0.2, lightness=0.1)
-    # # bg = pygame.transform.invert(bg)
-    # bg = pygame.transform.box_blur(bg, 10)
     bg = pygame.transform.smoothscale(bg, (scrx, scry))
     
-    newGame()
 
+    # audio
     # pygame.mixer.music.load(os.path.join('assets', 'audios', 'country.mp3'))
     # pygame.mixer.music.play()
     pygame.mixer.music.set_volume(0.1)
     
+    newGame()
+    
 
     while True:
-        
+        # print(timer.velocity)
         ''' rendering '''
         window.blit(bg, (0,0))
         # window.fill('gray')
-
+    
         timer.render(window)
+
         # computer 
         grid_1.render(window)
         grid_2.render(window)
@@ -195,52 +209,50 @@ def game():
         pygame.draw.circle(window, 'black', (scrx/4-128-16, 128), 32)
         pygame.draw.circle(window, 'white', (3 * scrx/4 + 128 + 16, 128), 32)
 
-        
-
-
         # player area
         player.render(window)
+        
+        guess_button.render(window, correct_verifies)
 
         # hand
         hand.render(window, (scrx-128, scry - (scry/4)))
         window.blit(text.render('current piece', 0, 'black'), (scrx-128-32, scry - (scry/4)-32))
-        
-
-        # interface
-        # guess_button = pygame.Rect((64, scry - (scry/4)-32), (64+32, 64))
-        # if correct_verifies < 1:
-        #     button_status = 'dark gray'
-        # else: 
-        #     button_status = 'dark green'
-        # pygame.draw.rect(window, button_status, guess_button)
-
+    
         window.blit(text.render(f'number of verifies: {verifies}', 0, 'black'), (scrx-128-64-16, scry - (scry/4)-64))
         window.blit(text.render(f'wins: {wins}', 0, 'black'),(scrx-128-16, scry - (scry/4)-64-32))
 
 
-        # guess_button.image = pygame.transform.hsl(guess_button.image, hue=-120, saturation=-1, lightness=0)
-        guess_button.render(window, correct_verifies)
-        
 
         ''' logic '''
-        if correct_verifies:
-            guess_button.update()
-
-        # for the guessing mechanic
-        if guess_button.status and correct_verifies:
-            gss = guess(window, inp)
-        else:
+        if not (guess_button.status and correct_verifies) and not paused:
             player.playerUpdate(window, inp)
             hand = Shape(attributes['color'][inp[2] % 3], attributes['shape'][inp[3] % 2])
 
+        if correct_verifies:        # only when the player has a valid structure that they can click the guess button
+            guess_button.update()
+
         # timer
         if timer.duration <= 0:
-            # make an exit function for this
-            default()
             pygame.mixer.music.stop()
-            guess_button.status = False
             save_highscore(name, wins)
             return menu()
+
+        # clicking on the guess button will bring up the guess menu
+        if guess_button.status and correct_verifies:
+            gss = guess_window.guess(window, inp)
+            
+        # pausing
+        if paused:
+            pause_value = pause_window.pause(window)
+            timer.velocity = 0
+            if pause_value == 1:
+                pygame.mixer.music.stop()
+                paused = False
+                return menu()
+            if pause_value == 2:
+                paused = False
+        else:
+            timer.velocity = wins * 0.1 + 0.1
 
         ''' event handling '''
 
@@ -249,6 +261,7 @@ def game():
                 pygame.quit()   
                 sys.exit()
 
+            # mouse input handling
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if guess_button.status:
                     correct_verifies = False
@@ -256,78 +269,68 @@ def game():
                 if not guess_button.status and correct_verifies:
                     inp[0], inp[1] = 0,0
 
+            # keyboard input handling
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    inp[1] -= 1
-                if event.key == pygame.K_s:
-                    inp[1] += 1
-                if event.key == pygame.K_d:
-                    inp[0] += 1
-                if event.key == pygame.K_a:
-                    inp[0] -= 1
-                
-                # for placing a piece; and not draw_guess for all these
-                if event.key == pygame.K_SPACE:
-                    if not guess_button.status:
-                        player.place(hand.color, hand.type)
-                if event.key == pygame.K_j:
-                    inp[2] += 1
-                if event.key == pygame.K_k:
-                    inp[3] += 1
-                if event.key == pygame.K_RETURN:
-                    if not guess_button.status:
-                        verifies += 1
-                        if player.checkGrid(secret_rule):
-                            correct_verifies = True
+                if not paused:
+                    if event.key == pygame.K_w:
+                        inp[1] -= 1
+                    if event.key == pygame.K_s:
+                        inp[1] += 1
+                    if event.key == pygame.K_d:
+                        inp[0] += 1
+                    if event.key == pygame.K_a:
+                        inp[0] -= 1
                     
-                    if guess_button.status:
-                        if gss == secret_rule:
-                            wins += 1
-                            inp[0], inp[1] = 4,4
-                            verifies = 0
-                            timer.velocity += 0.1
-                            timer.reset()
-                            newGame()
-                            player.clear()
+                    # for placing a piece; and not draw_guess for all these
+                    if event.key == pygame.K_SPACE:
+                        if not guess_button.status:
+                            player.place(hand.color, hand.type)
+                    if event.key == pygame.K_j:
+                        inp[2] += 1
+                    if event.key == pygame.K_k:
+                        inp[3] += 1
+                    if event.key == pygame.K_RETURN:
+                        if not guess_button.status:
+                            verifies += 1
+                            if player.checkGrid(secret_rule):
+                                correct_verifies = True
                         
-                        correct_verifies = False
-                        guess_button.status = False
-                    
-                    
-                if event.key == pygame.K_BACKSPACE:
-                    if not guess_button.status:
-                        player.clear()
+                        if guess_button.status:
+                            if gss == secret_rule:
+                                wins += 1
+                                inp[0], inp[1] = 4,4
+                                verifies = 0
+                                timer.velocity += 0.1
+                                timer.reset()
+                                newGame()
+                                player.clear()
+                            
+                            correct_verifies = False
+                            guess_button.status = False
+                        
+                    if event.key == pygame.K_BACKSPACE:
+                        if not guess_button.status:
+                            player.clear()
 
-                if event.key == pygame.K_TAB:
-                    if not guess_button.status and correct_verifies:
-                        inp[0], inp[1] = 0,0
-                        guess_button.status = True
-                    else:
-                        correct_verifies = False
-                        guess_button.status = False
-
+                    if event.key == pygame.K_TAB:
+                        if not guess_button.status and correct_verifies:
+                            inp[0], inp[1] = 0,0
+                            guess_button.status = True
+                        else:
+                            correct_verifies = False
+                            guess_button.status = False
 
                 if event.key == pygame.K_ESCAPE:
-                    default()
-                    pygame.mixer.music.stop()
-                    guess_button.status = False
-                    return menu()
-                        
+                    if not paused:
+                        paused = True
+                    else:
+                        paused = False
 
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_w:
-                    pass
-                if event.key == pygame.K_s:
-                    pass
-                if event.key == pygame.K_a:
-                    pass
-                if event.key == pygame.K_d:
-                    pass
-        
 
         ''' technical shi '''
         pygame.display.update()
         pygame.clock.tick(60)
 
+
+# run the game
 menu()    
-game()

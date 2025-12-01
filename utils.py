@@ -9,12 +9,7 @@ from grid import *
 
 pygame.init()
 
-''' global variables '''
-scrx, scry = 720, 480
-# scrx, scry = 1080, 720
-center = (scrx/2,scry/2)
-
-
+''' global module dependent svariables '''
 text = pygame.font.Font(os.path.join('assets', 'fonts', 'Sofia_Handwritten.otf'),28)
 nametext = pygame.font.Font(os.path.join('assets', 'fonts', 'Sofia_Handwritten.otf'),36)
 button = pygame.font.SysFont('comic_sans',36)

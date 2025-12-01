@@ -4,6 +4,7 @@ To do list:
 [ ] make a pause button
 [ ] bug fixing
     [ ] figure out why the default function aint working
+[ ] remove the zero amount mechanic
 
 2. Make the documentation
 [ ] main.py
@@ -14,13 +15,11 @@ To do list:
 [ ] utils.py
 
 
-
 3. Make the assets of the following:
 [ ] Background of Title screen
 [ ] Back ground of the game
 [ ] Music for the game
-    [ ] wins
-    [ ] lose
+    [ ] times up
     [ ] correct guess
     [ ] incorrect guess
     [ ] valid structure
