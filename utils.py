@@ -6,10 +6,11 @@ import pygame, random
 from defaults import *
 from rule import *
 from grid import *
+from rule import *
 
 pygame.init()
 
-''' global module dependent svariables '''
+''' global module dependent variables '''
 text = pygame.font.Font(os.path.join('assets', 'fonts', 'Sofia_Handwritten.otf'),28)
 nametext = pygame.font.Font(os.path.join('assets', 'fonts', 'Sofia_Handwritten.otf'),36)
 button = pygame.font.SysFont('comic_sans',36)
@@ -26,6 +27,7 @@ else:
 
 
 ''' global functions '''
+
 # turn into a high score class
 def sort_s(e):      # for sorting the high scores
     return e[3:e.find('\n')]

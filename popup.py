@@ -133,7 +133,7 @@ class Timer():
             pygame.draw.rect(surf, 'dark gray', ((self.pos_1[0]+1, self.pos_1[1]), (self.duration, 64)))
             pygame.draw.rect(surf, 'dark gray', ((self.pos_2[0]-1, self.pos_2[1]), (self.duration, 64)))
 
-        print(self.velocity)
+            
 
 class Highscore():
     def __init__(self, pos, highscores):

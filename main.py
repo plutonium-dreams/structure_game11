@@ -24,10 +24,9 @@ To do list:
 [/] add a timer function
 [/] fix the shape appearing on guess mode and on hand (make them the same counters nalang)
 [/] add a high score system
-[ ] make the guess mode amount counter always be 0
-
-[ ] polish the timer system
-[ ] game polishing
+[/] make the guess mode amount counter always be 0
+[/] polish the timer system
+[/] game polishing
     - make the computer present one correct and one wrong structure
     - add more rules, possible variation
         - add orientation/pointing/grounded
@@ -35,7 +34,6 @@ To do list:
     - more polished assets
     - add a main menu system with easy and hard levels
 '''
-
 import pygame, random, sys
 from utils import *
 from defaults import *
@@ -45,17 +43,11 @@ from shape import *
 from popup import *
 
 
-
 ''' initialize '''
 pygame.init()
 
-pygame.display.set_caption('Arki (working prototype)')
 window = pygame.display.set_mode((scrx, scry))
 pygame.clock = pygame.time.Clock()
-
-# buttons
-guess_button = Button((64, scry - (scry/4)-32), 'button.png', (128, 64))
-start_button = Button((center[0]-128-32, center[1]+128), 'button.png', (128, 64))
 
 secret_rule = []
 fake_rule = []
@@ -65,8 +57,22 @@ grid_2 = Grid((3*scrx/4, 128))
 
 player = PlayerGrid((center[0], scry - (scry/4)))
 
+# buttons
+guess_button = Button((64, scry - (scry/4)-32), 'button.png', (128, 64))
+start_button = Button((center[0]-128-32, center[1]+128), 'button.png', (128, 64))
 
-''' global functions '''
+''' game stuff '''
+hand = Shape(attributes['color'][0], attributes['shape'][0]) # default hand
+
+
+def default():
+    player.clear()
+    verifies = 0
+    correct_verifies = False
+    draw_guess = False
+    timer.reset()
+
+
 
 def newGame():
     global grid_1
@@ -89,12 +95,11 @@ def newGame():
             grid_1.genGrid(secret_rule)
             grid_2.genGrid(fake_rule)
 
-    player.clear()
-    verifies = 0
-    correct_verifies = False
-    draw_guess = False
-    timer.reset()
-
+    # player.clear()
+    # verifies = 0
+    # correct_verifies = False
+    # draw_guess = False
+    # timer.reset()
 
     print(f'Secret Rule: {secret_rule}')
     print()
@@ -102,11 +107,6 @@ def newGame():
     print()
     print(grid_2)
 
-
-''' game stuff '''
-hand = Shape(attributes['color'][0], attributes['shape'][0]) # default hand
-
-''' testing stuff '''
 
 
 # main menu
@@ -181,9 +181,15 @@ def game():
     guess_button.status = False
     timer.reset()
 
-    # background testing
-    bg = pygame.image.load(os.path.join('assets', 'images', 'bg1.png'))
+    # backgrounds
+    bg = pygame.image.load(os.path.join('assets', 'images', f'bg{random.randint(1,3)}.png')).convert()
     bg = pygame.transform.smoothscale(bg, (scrx, scry))
+
+    grid_wrapper = pygame.image.load(os.path.join('assets', 'images', 'grid_wrapper.png')).convert()
+    grid_wrapper = pygame.transform.scale_by(grid_wrapper, 1.1)
+    grid_wrapper = pygame.transform.hsl(grid_wrapper, hue=230, saturation=1, lightness=0.2)
+    # grid_1_wrapper.set_alpha(0.1)
+    # grid_1_wrapper = grid_1_wrapper.premul_alpha()
     
 
     # audio
@@ -191,9 +197,8 @@ def game():
     # pygame.mixer.music.play()
     pygame.mixer.music.set_volume(0.1)
     
-    newGame()
+    newGame()               # NEW GAME
     
-
     while True:
         # print(timer.velocity)
         ''' rendering '''
@@ -203,9 +208,12 @@ def game():
         timer.render(window)
 
         # computer 
+        window.blit(grid_wrapper, (scrx/4 - 96-9, 128 - 96-9))       # draws the background of the grids; put inside the computer function in the grid class
+        window.blit(grid_wrapper, (3 * scrx/4 - 96-9, 128 - 96-9))
+        
         grid_1.render(window)
         grid_2.render(window)
-        pygame.draw.circle(window, 'black', center, 5)
+        # pygame.draw.circle(window, 'black', center, 5)
         pygame.draw.circle(window, 'black', (scrx/4-128-16, 128), 32)
         pygame.draw.circle(window, 'white', (3 * scrx/4 + 128 + 16, 128), 32)
 
@@ -254,8 +262,9 @@ def game():
         else:
             timer.velocity = wins * 0.1 + 0.1
 
-        ''' event handling '''
 
+
+        ''' event handling '''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()   
@@ -302,7 +311,7 @@ def game():
                                 verifies = 0
                                 timer.velocity += 0.1
                                 timer.reset()
-                                newGame()
+                                newGame()                       # NEW GAME
                                 player.clear()
                             
                             correct_verifies = False
@@ -330,6 +339,7 @@ def game():
         ''' technical shi '''
         pygame.display.update()
         pygame.clock.tick(60)
+        pygame.display.set_caption(f'Arki (working prototype) {pygame.clock.get_fps()}')
 
 
 # run the game
