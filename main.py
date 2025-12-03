@@ -33,6 +33,10 @@ To do list:
     - add the ability to delete a placed piece
     - more polished assets
     - add a main menu system with easy and hard levels
+[/] remove the zero amount thing
+[/] add a no timer mode
+[/] translucent timer
+[/] add the graphics
 '''
 import pygame, random, sys
 from utils import *
@@ -40,7 +44,7 @@ from defaults import *
 from grid import *
 from rule import *
 from shape import *
-from popup import *
+from window import *
 
 
 ''' initialize '''
@@ -49,6 +53,21 @@ pygame.init()
 window = pygame.display.set_mode((scrx, scry))
 pygame.clock = pygame.time.Clock()
 
+
+''' functions that cant go anywhere else'''
+timer = Timer((0, center[1]-32))
+guess_window = Guess((scrx/4, scry/4), (360,240))
+pause_window = Pause((25, 25), (scrx * 7/8 + 32, scry * 7/8))
+
+hand = Shape(attributes['color'][0], attributes['shape'][0]) # default hand
+
+# buttons
+guess_button = Button((64, scry - (scry/4)-32), 'button.png', (128, 64))
+start_button = Button((center[0]-128-32, center[1]+128), 'button.png', (128, 64))
+timer_button = Button((center[0]-256-32, center[1]+128), 'button.png', (64, 64))
+
+''' main functions '''
+# new game
 secret_rule = []
 fake_rule = []
 
@@ -56,23 +75,6 @@ grid_1 = Grid((scrx/4, 128))
 grid_2 = Grid((3*scrx/4, 128))
 
 player = PlayerGrid((center[0], scry - (scry/4)))
-
-# buttons
-guess_button = Button((64, scry - (scry/4)-32), 'button.png', (128, 64))
-start_button = Button((center[0]-128-32, center[1]+128), 'button.png', (128, 64))
-
-''' game stuff '''
-hand = Shape(attributes['color'][0], attributes['shape'][0]) # default hand
-
-
-def default():
-    player.clear()
-    verifies = 0
-    correct_verifies = False
-    draw_guess = False
-    timer.reset()
-
-
 
 def newGame():
     global grid_1
@@ -88,18 +90,7 @@ def newGame():
     grid_1.genGrid(secret_rule)
     grid_2.genGrid(fake_rule)
     if grid_2.checkGrid(secret_rule):       # needs to be more efficient so that grid 2 can never accidentally follow the secret rule even when its following the fake rule
-        grid_1.genGrid(secret_rule)
-        grid_2.genGrid(fake_rule)
-
-        if grid_2.checkGrid(secret_rule):
-            grid_1.genGrid(secret_rule)
-            grid_2.genGrid(fake_rule)
-
-    # player.clear()
-    # verifies = 0
-    # correct_verifies = False
-    # draw_guess = False
-    # timer.reset()
+        return newGame()
 
     print(f'Secret Rule: {secret_rule}')
     print()
@@ -113,29 +104,36 @@ def newGame():
 def menu():
     global inp
     global name
+    global highscore
+
+    highscore = Highscore((center[0]+128+16, center[1]+128))
+
     title = pygame.image.load(os.path.join('assets', 'images', 'title.png'))
     title = pygame.transform.scale_by(title, 9/10)
 
-    highscores = read_highscore()
-    nameinput = Highscore((center[0]+128+16, center[1]+128), highscores)
-    
     while True:
         window.fill(('gray'))
 
+        
         start_button.render(window, True)
         window.blit(title, (center[0] - title.get_width()/2-110,center[1]-title.get_height()/2-64))
 
-        nameinput.update()
+        highscore.update()
 
-        nameinput.render(window)
-
+        highscore.render(window)
 
         start_button.update()
-
         if start_button.status:
             start_button.status = False
-            name = nameinput.savename()
+            name = highscore.savename()
             return game()
+
+        timer_button.update()
+        if timer_button.status:             # on/off status of the timer present button
+            Button((center[0]-256-32, center[1]+128), 'button.png', (64, 64)).render(window, True)
+        else:
+            timer_button.render(window, False)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -152,7 +150,7 @@ def menu():
                     inp[0] -= 1
                 if event.key == pygame.K_RETURN:
                     start_button.status = False
-                    name = nameinput.savename()
+                    name = highscore.savename()
                     return game()
 
         pygame.display.update()
@@ -171,30 +169,36 @@ def game():
     global draw_guess
     global paused
     global hand
+    global highscore
+    global secret_rule
 
+    # default values
     wins = 0
     inp = [0,0,0,0,0]
     player.clear()
     verifies = 0
     correct_verifies = False
     draw_guess = False
+    
     guess_button.status = False
     timer.reset()
 
     # backgrounds
-    bg = pygame.image.load(os.path.join('assets', 'images', f'bg{random.randint(1,3)}.png')).convert()
-    bg = pygame.transform.smoothscale(bg, (scrx, scry))
+    bg_num = random.randint(1,3)
 
-    grid_wrapper = pygame.image.load(os.path.join('assets', 'images', 'grid_wrapper.png')).convert()
+    grid_wrapper = pygame.image.load(os.path.join('assets', 'images', 'grid_wrapper.png')).convert_alpha()
     grid_wrapper = pygame.transform.scale_by(grid_wrapper, 1.1)
-    grid_wrapper = pygame.transform.hsl(grid_wrapper, hue=230, saturation=1, lightness=0.2)
-    # grid_1_wrapper.set_alpha(0.1)
-    # grid_1_wrapper = grid_1_wrapper.premul_alpha()
+    grid_wrapper = pygame.transform.hsl(grid_wrapper, hue=240, saturation=1, lightness=0.1)
+    grid_wrapper = grid_wrapper.premul_alpha()
     
 
     # audio
-    # pygame.mixer.music.load(os.path.join('assets', 'audios', 'country.mp3'))
-    # pygame.mixer.music.play()
+    if timer_button.status:
+        pygame.mixer.music.load(os.path.join('assets', 'audios', 'country.mp3'))
+    else:
+        pygame.mixer.music.load(os.path.join('assets', 'audios', 'zen.mp3'))
+
+    pygame.mixer.music.play()
     pygame.mixer.music.set_volume(0.1)
     
     newGame()               # NEW GAME
@@ -202,14 +206,17 @@ def game():
     while True:
         # print(timer.velocity)
         ''' rendering '''
+        bg = pygame.image.load(os.path.join('assets', 'images', f'bg{bg_num}.png')).convert()
+        bg = pygame.transform.smoothscale(bg, (scrx, scry))
         window.blit(bg, (0,0))
         # window.fill('gray')
-    
-        timer.render(window)
+
+        if timer_button.status:
+            timer.render(window)
 
         # computer 
-        window.blit(grid_wrapper, (scrx/4 - 96-9, 128 - 96-9))       # draws the background of the grids; put inside the computer function in the grid class
-        window.blit(grid_wrapper, (3 * scrx/4 - 96-9, 128 - 96-9))
+        window.blit(grid_wrapper, (scrx/4 - 96-9, 128 - 96-9), special_flags=pygame.BLEND_PREMULTIPLIED)       # draws the background of the grids; put inside the computer function in the grid class
+        window.blit(grid_wrapper, (3 * scrx/4 - 96-9, 128 - 96-9), special_flags=pygame.BLEND_PREMULTIPLIED)
         
         grid_1.render(window)
         grid_2.render(window)
@@ -230,7 +237,6 @@ def game():
         window.blit(text.render(f'wins: {wins}', 0, 'black'),(scrx-128-16, scry - (scry/4)-64-32))
 
 
-
         ''' logic '''
         if not (guess_button.status and correct_verifies) and not paused:
             player.playerUpdate(window, inp)
@@ -240,9 +246,9 @@ def game():
             guess_button.update()
 
         # timer
-        if timer.duration <= 0:
+        if timer_button.status and timer.duration <= 0:
             pygame.mixer.music.stop()
-            save_highscore(name, wins)
+            highscore.save_highscore(name, wins)
             return menu()
 
         # clicking on the guess button will bring up the guess menu
@@ -261,7 +267,6 @@ def game():
                 paused = False
         else:
             timer.velocity = wins * 0.1 + 0.1
-
 
 
         ''' event handling '''
@@ -301,6 +306,7 @@ def game():
                     if event.key == pygame.K_RETURN:
                         if not guess_button.status:
                             verifies += 1
+                            
                             if player.checkGrid(secret_rule):
                                 correct_verifies = True
                         
@@ -311,8 +317,12 @@ def game():
                                 verifies = 0
                                 timer.velocity += 0.1
                                 timer.reset()
-                                newGame()                       # NEW GAME
                                 player.clear()
+                                if not timer_button.status:
+                                    bg_num = random.randint(1,3)
+
+                                newGame()
+                                
                             
                             correct_verifies = False
                             guess_button.status = False
@@ -336,11 +346,11 @@ def game():
                         paused = False
 
 
-        ''' technical shi '''
+        ''' technical stuff'''
         pygame.display.update()
         pygame.clock.tick(60)
         pygame.display.set_caption(f'Arki (working prototype) {pygame.clock.get_fps()}')
 
 
-# run the game
+''' run the game '''
 menu()    

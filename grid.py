@@ -6,6 +6,10 @@ from rule import *
 from shape import *
 
 class Grid:
+    '''
+    Grid class
+    Description: 
+    '''
     def __init__(self, pos):
         self.grid = [
             [], [], [],
@@ -112,6 +116,3 @@ class PlayerGrid(Grid):
         self.cell_pos = (self.curs_pos[0]) + (self.curs_pos[1] * 3) 
 
         surf.blit(self.cursor, (self.center[0] + (64 * self.curs_pos[0]), self.center[1] + (64 * self.curs_pos[1])))
-
-
-# grid_1 = Grid((400,400)).genGrid(generateSecretRule())

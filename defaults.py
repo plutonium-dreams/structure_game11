@@ -7,11 +7,11 @@ scrx, scry = 720, 480
 center = (scrx/2,scry/2)
 
 name = 'KNB'
-highscores = []
+highscore = []
 
 inp = [0,0,0,0,0]     # input cursor
 verifies = 0    # number if correct verifies
 correct_verifies = False    # verify pass
 wins = 0    # number of wins
 draw_guess = False      # guessing screen status
-paused = False
+paused = False          # pause screen status

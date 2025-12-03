@@ -6,7 +6,7 @@ import pygame, random
 
 # attributes
 attributes = {
-    'quantity': [0,1,2,3],
+    'quantity': [1,2,3],
     'color': ['red','yellow','blue'],
     'shape': ['square','triangle'],
 }

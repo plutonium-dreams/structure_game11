@@ -1,6 +1,11 @@
 '''
 Shapes module
 
+Overview
+
+Dependencies
+
+
 '''
 
 import pygame, os
@@ -8,6 +13,10 @@ import pygame, os
 pygame.init()
 
 class Shape():
+    '''
+    Shape class
+    Description: 
+    '''
     def __init__(self, color, tipe):
         self.color = color
         self.type = tipe

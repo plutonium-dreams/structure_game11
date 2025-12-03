@@ -6,14 +6,16 @@ import pygame, random
 from defaults import *
 from rule import *
 from grid import *
-from rule import *
+
 
 pygame.init()
 
+
+
 ''' global module dependent variables '''
+
 text = pygame.font.Font(os.path.join('assets', 'fonts', 'Sofia_Handwritten.otf'),28)
 nametext = pygame.font.Font(os.path.join('assets', 'fonts', 'Sofia_Handwritten.otf'),36)
-button = pygame.font.SysFont('comic_sans',36)
 
 if os.path.exists(os.path.join('data', 'highscores.txt')):
     highscores_file = open(os.path.join('data', 'highscores.txt'), 'r')
@@ -24,30 +26,7 @@ else:
     highscores_file = open(os.path.join('data', 'highscores.txt'), 'r')
     highscores_file.close()
 
-
-
 ''' global functions '''
-
-# turn into a high score class
-def sort_s(e):      # for sorting the high scores
-    return e[3:e.find('\n')]
-
-def save_highscore(name, wins):
-    with open(os.path.join('data', 'highscores.txt'), 'a') as highscores_file:
-        highscores_file.write(f'{name}:{wins}\n')
-
-def read_highscore():
-    highscores = list()
-    with open(os.path.join('data', 'highscores.txt'), 'r') as highscores_file:
-        for score in highscores_file:
-            highscores.append(score)
-        return highscores
-
-# def update_highscore():
-#     with open(os.path.join('data', 'highscores.txt'), 'r') as highscores_file:
-#         for score in highscores_file:
-#             if score[4:score.find('\n')] > highscores[score[:3]]:
-#                 highscores.update({score[:3] : score[4:score.find('\n')]})
 
 
 
@@ -86,7 +65,122 @@ class Button():
             surf.blit(pygame.transform.hsl(self.image, hue=-120, saturation=-1, lightness=0), self.pos)
         
             
+class Timer():
+    def __init__(self, pos):
+        global scrx
+        global wins
+
+        self.duration = scrx
+        self.pos_copy = pos
+        self.pos_1 = list(pos)
+        self.pos_2 = [self.duration + pos[0], pos[1]]
+        self.velocity = 10
+
+    def reset(self):
+        self.duration = scrx
+        self.pos_1 = list(self.pos_copy)
+        self.pos_2 = [self.duration + self.pos_copy[0], self.pos_copy[1]]
+
+    def render(self, surf):
+        if self.duration > 0:
+            self.pos_1[0] += self.velocity
+            self.duration -= self.velocity
+            
+            self.surface = pygame.Surface((scrx, 64))
+            self.surface.fill('dark gray')
+            self.surface.set_alpha(80)
+
+            surf.blit(self.surface, (self.pos_1[0], self.pos_1[1]))
+
+            
+class Highscore():
+    def __init__(self, pos):
+        global name
+        self.pos = pos
+        self.name = name
+
+        self.highscores = list()
+        with open(os.path.join('data', 'highscores.txt'), 'r') as highscores_file:
+            for score in highscores_file:
+                self.highscores.append(score)
+        
+        self.button_A = Button(pos, 'button.png', (64, 64))
+        self.button_B = Button((pos[0]+64, pos[1]), 'button.png', (64, 64))
+        self.button_C = Button((pos[0]+128, pos[1]), 'button.png', (64, 64))
+        self.buttons = [self.button_A, self.button_B, self.button_C]
+
+        self.A = 0
+        self.B = 0
+        self.C = 0
+
+        self.state = [0,0,0]
 
         
+    def update(self):
+        self.state = [(self.A % 26) + 65, (self.B % 26) + 65, (self.C % 26) + 65]
+        
+        for button in self.buttons:
+            button.update()
+
+        if self.button_A.status:
+            self.A += 1
+            self.button_A.status = False
+        if self.button_B.status:
+            self.B += 1
+            self.button_B.status = False
+        if self.button_C.status:
+            self.C += 1
+            self.button_C.status = False
+
+        # print(self.state)
+    
+    def save_highscore(self, name, wins):
+        with open(os.path.join('data', 'highscores.txt'), 'a') as highscores_file:
+            highscores_file.write(f'{name}:{wins}\n')
+    
+    def sort_s(self, e):      # for sorting the high scores
+        return e[3:e.find('\n')]
+
+    def sort_highscores(self):
+        sort = []
+        for score in self.highscores:
+            if int(score[4:score.find('\n')]) >= 100:
+                sort.append(score)
+        for score in self.highscores:
+            if 10 <= int(score[4:score.find('\n')]) < 100:
+                sort.append(score)
+            self.highscores.sort(reverse=True, key=self.sort_s)
+        for score in self.highscores:
+            if 1 <= int(score[4:score.find('\n')]) < 10:
+                sort.append(score)
+            self.highscores.sort(reverse=True, key=self.sort_s)
+        return sort
+
+
+    def render(self, surf):
+        for button in self.buttons:
+            button.render(surf, True)
+        
+        for i in range(len(self.state)):
+            surf.blit(nametext.render(chr(self.state[i]), 0, 'black'), (32 + self.pos[0] + 64 * i, self.pos[1]-32-16))
+
+        for i in range(5):
+            try:
+                score = nametext.render(self.sort_highscores()[i], 0, 'black')
+            except IndexError:
+                score = nametext.render('-------', 0, 'black')
+            surf.blit(score, (self.pos[0]+64, (self.pos[1]-224) + 32*i))
+        
+        surf.blit(nametext.render('High Scores',0,'gold', bgcolor='black'), (self.pos[0]+48, self.pos[1]-272))
+        # print(self.highscores)
+        # print(self.sort_highscores())
+
+    def savename(self):
+        name = ''
+        for i in self.state:
+            name += chr(i)
+        
+        return name
         
         
+
