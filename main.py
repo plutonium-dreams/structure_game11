@@ -194,7 +194,7 @@ def game():
 
     # audio
     if timer_button.status:
-        pygame.mixer.music.load(os.path.join('assets', 'audios', 'country.mp3'))
+        pygame.mixer.music.load(os.path.join('assets', 'audios', 'funk.mp3'))
     else:
         pygame.mixer.music.load(os.path.join('assets', 'audios', 'zen.mp3'))
 
@@ -210,6 +210,8 @@ def game():
         bg = pygame.transform.smoothscale(bg, (scrx, scry))
         window.blit(bg, (0,0))
         # window.fill('gray')
+
+        # window.blit(pygame.image.load(os.path.join('assets', 'images', 'paperclips.png')))
 
         if timer_button.status:
             timer.render(window)
