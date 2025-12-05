@@ -56,6 +56,7 @@ pygame.clock = pygame.time.Clock()
 
 ''' functions that cant go anywhere else'''
 timer = Timer((0, center[1]-32))
+# (323,187)
 guess_window = Guess((scrx/4, scry/4), (360,240))
 pause_window = Pause((25, 25), (scrx * 7/8 + 32, scry * 7/8))
 
@@ -63,8 +64,8 @@ hand = Shape(attributes['color'][0], attributes['shape'][0]) # default hand
 
 # buttons
 guess_button = Button((64, scry - (scry/4)-32), 'button.png', (128, 64))
-start_button = Button((center[0]-128-32, center[1]+128), 'button.png', (128, 64))
-timer_button = Button((center[0]-256-32, center[1]+128), 'button.png', (64, 64))
+start_button = Button((center[0]-128-32, center[1]+128), 'start_button.png', (160, 80))
+timer_button = Button((center[0]-256-48, center[1]+128), 'timer_button.png', (256*0.4, 186*0.4))
 
 ''' main functions '''
 # new game
@@ -111,12 +112,18 @@ def menu():
     title = pygame.image.load(os.path.join('assets', 'images', 'title.png'))
     title = pygame.transform.scale_by(title, 9/10)
 
+
+
     while True:
         window.fill(('gray'))
 
+        window.blit(pygame.image.load(os.path.join('assets', 'images', 'paperclips.png')))
+
         
         start_button.render(window, True)
-        window.blit(title, (center[0] - title.get_width()/2-110,center[1]-title.get_height()/2-64))
+        window.blit(title, (center[0] - title.get_width()/2-94,center[1]-title.get_height()/2-64))
+
+        
 
         highscore.update()
 
@@ -130,7 +137,7 @@ def menu():
 
         timer_button.update()
         if timer_button.status:             # on/off status of the timer present button
-            Button((center[0]-256-32, center[1]+128), 'button.png', (64, 64)).render(window, True)
+            Button((center[0]-256-48, center[1]+128), 'timer_button.png', (256*0.4, 186*0.4)).render(window, True)
         else:
             timer_button.render(window, False)
 
@@ -155,6 +162,7 @@ def menu():
 
         pygame.display.update()
         pygame.clock.tick(60)
+        pygame.display.set_caption(f'Arki (working prototype) {pygame.clock.get_fps()}')
 
 
 
@@ -189,12 +197,17 @@ def game():
     grid_wrapper = pygame.image.load(os.path.join('assets', 'images', 'grid_wrapper.png')).convert_alpha()
     grid_wrapper = pygame.transform.scale_by(grid_wrapper, 1.1)
     grid_wrapper = pygame.transform.hsl(grid_wrapper, hue=240, saturation=1, lightness=0.1)
+    # grid_wrapper.set_alpha(1)
     grid_wrapper = grid_wrapper.premul_alpha()
+
+    # player dashboard
+    dashboard = pygame.image.load(os.path.join('assets', 'images', 'dashboard.png'))
+    dashboard = pygame.transform.scale_by(dashboard, 1)
     
 
     # audio
     if timer_button.status:
-        pygame.mixer.music.load(os.path.join('assets', 'audios', 'country.mp3'))
+        pygame.mixer.music.load(os.path.join('assets', 'audios', 'funk.mp3'))
     else:
         pygame.mixer.music.load(os.path.join('assets', 'audios', 'zen.mp3'))
 
@@ -211,12 +224,14 @@ def game():
         window.blit(bg, (0,0))
         # window.fill('gray')
 
+        # window.blit(pygame.image.load(os.path.join('assets', 'images', 'paperclips.png')))
+
         if timer_button.status:
             timer.render(window)
 
         # computer 
-        window.blit(grid_wrapper, (scrx/4 - 96-9, 128 - 96-9), special_flags=pygame.BLEND_PREMULTIPLIED)       # draws the background of the grids; put inside the computer function in the grid class
-        window.blit(grid_wrapper, (3 * scrx/4 - 96-9, 128 - 96-9), special_flags=pygame.BLEND_PREMULTIPLIED)
+        # window.blit(grid_wrapper, (scrx/4 - 96-9, 128 - 96-9), special_flags=pygame.BLEND_RGBA_MIN)       # draws the background of the grids; put inside the computer function in the grid class
+        # window.blit(grid_wrapper, (3 * scrx/4 - 96-9, 128 - 96-9), special_flags=pygame.BLEND_PREMULTIPLIED)
         
         grid_1.render(window)
         grid_2.render(window)
@@ -229,12 +244,12 @@ def game():
         
         guess_button.render(window, correct_verifies)
 
+        window.blit(dashboard, (scrx-128-96-16, scry - (scry/4)-96-16))
+
         # hand
-        hand.render(window, (scrx-128, scry - (scry/4)))
-        window.blit(text.render('current piece', 0, 'black'), (scrx-128-32, scry - (scry/4)-32))
-    
-        window.blit(text.render(f'number of verifies: {verifies}', 0, 'black'), (scrx-128-64-16, scry - (scry/4)-64))
-        window.blit(text.render(f'wins: {wins}', 0, 'black'),(scrx-128-16, scry - (scry/4)-64-32))
+        hand.render(window, (scrx-128-32, scry - (scry/4)+16))
+
+        window.blit(wintext.render(f'{wins}', 0, 'black'),(scrx-96, scry - (scry/4)-64-8))
 
 
         ''' logic '''
@@ -288,6 +303,7 @@ def game():
                 if not paused:
                     if event.key == pygame.K_w:
                         inp[1] -= 1
+                        
                     if event.key == pygame.K_s:
                         inp[1] += 1
                     if event.key == pygame.K_d:
@@ -305,8 +321,10 @@ def game():
                         inp[3] += 1
                     if event.key == pygame.K_RETURN:
                         if not guess_button.status:
-                            verifies += 1
-                            
+ 
+                            # pygame.mixer.music.set_volume(1)
+                            # pygame.mixer.music.load(os.path.join('assets', 'audios', 'correct.mp3'))
+                            # pygame.mixer.music.play()
                             if player.checkGrid(secret_rule):
                                 correct_verifies = True
                         
@@ -314,10 +332,10 @@ def game():
                             if gss == secret_rule:
                                 wins += 1
                                 inp[0], inp[1] = 4,4
-                                verifies = 0
                                 timer.velocity += 0.1
                                 timer.reset()
                                 player.clear()
+                                
                                 if not timer_button.status:
                                     bg_num = random.randint(1,3)
 

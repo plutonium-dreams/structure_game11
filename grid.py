@@ -74,6 +74,10 @@ class Grid:
         return 0
 
     def genGrid(self, srule):
+        '''
+        Overview:
+        
+        '''
         self.clear()
         snum = [0, 0]
 
