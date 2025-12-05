@@ -1,5 +1,9 @@
 '''
-Pop-ups module
+Windows Module
+
+Overview
+
+Dependencies
 
 '''
 import pygame, os, math
@@ -10,6 +14,11 @@ from rule import *
 pygame.init()
 
 class Window():
+    '''
+    Window Class
+    Description: Class template for all objects that involve a window being displayed on top of the player's screen
+    '''
+
     def __init__(self, pos, size):
         self.pos = pos
         self.size = size
@@ -19,11 +28,20 @@ class Window():
         self.window = pygame.transform.scale(self.window, self.size)
         
     def render(self, surf):
+        '''
+        Renders the window to the surface 
+        '''
         surf.blit(self.window, self.pos)
 
 class Guess(Window):
+    '''
+    Window Class
+    Description: Class template for all objects that involve a window being displayed on top of the player's screen
+    '''
     def __init__(self, pos, size):
         super().__init__(pos, size)
+        self.image = pygame.image.load(os.path.join('assets', 'images', 'guess_menu.png'))
+        self.image = pygame.transform.scale(self.image, (360,240))
         self.number = 0
 
     def guess(self, surf, inp):
@@ -45,10 +63,17 @@ class Guess(Window):
 class Pause(Window):
     def __init__(self, pos, size):
         super().__init__(pos, size)
-        self.exit_button = Button((size[0]/2 - 64,size[1]/2 - 32 - 48), 'button.png', (128,64))
+        self.image = pygame.image.load(os.path.join('assets', 'images', 'pause.png'))
+        self.image = pygame.transform.scale(self.image, self.size)
+        self.window = pygame.Surface(size)
+        self.window = pygame.transform.scale(self.window, self.size)
+        self.window.set_colorkey('black')
+
+
+        self.exit_button = Button((size[0]/2 - 80,size[1]/2 - 32 + 48), 'resume_button.png', (238 * 0.63,114 * 0.63))
         self.exit_button.rect.x += self.pos[0]
         self.exit_button.rect.y += self.pos[1]
-        self.resume_button = Button((size[0]/2 - 64,size[1]/2 - 32 + 48), 'button.png', (128,64))
+        self.resume_button = Button((size[0]/2 - 128,size[1]/2 - 32 - 48), 'menu_button.png', (248,73))
         self.resume_button.rect.x += self.pos[0]
         self.resume_button.rect.y += self.pos[1]
 

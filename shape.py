@@ -8,7 +8,7 @@ Dependencies
 
 '''
 
-import pygame, os
+import pygame, os, random
 
 pygame.init()
 
@@ -23,7 +23,7 @@ class Shape():
         '''
         self.color = color
         self.type = tipe
-        self.image = pygame.image.load(os.path.join('assets', 'images', '.'.join([f'{color}_{tipe}', 'png'])))
+        self.image = pygame.image.load(os.path.join('assets', 'images','.'.join([f'{color}_{tipe}', 'png'])))
         self.image = pygame.transform.scale(self.image, (64,64))
 
         self.pos = (0,0)
