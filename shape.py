@@ -15,8 +15,11 @@ pygame.init()
 class Shape():
     '''
     Shape class
-    Description: 
+    Description: Holds functions responsible grabbing specific shapes, color and type, from the game assets
+    and rendering them on the grids. 
     '''
+
+    # function for loading specific shape images from the game assets and scaling them
     def __init__(self, color, tipe):
         self.color = color
         self.type = tipe
@@ -25,6 +28,7 @@ class Shape():
 
         self.pos = (0,0)
 
+    # function rendering a shape, based on the class, on a set position on a surface
     def render(self, surf, pos):
         self.pos = pos
         surf.blit(self.image, self.pos)
