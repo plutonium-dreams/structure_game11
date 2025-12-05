@@ -1,24 +1,20 @@
 '''
 Secret Rule module
+Description: 
 
 '''
 import pygame, random
 
-# attributes
+# dictionary containing all the possible quantities, colors, and shapes that can make the secret rule
 attributes = {
     'quantity': [1,2,3],
     'color': ['red','yellow','blue'],
     'shape': ['square','triangle'],
 }
 
-# secret rule format
-# [qty, color, shape]
+# creates the secret rule stored in the secret_rule list
+# secret rule format [quantity, color, shape]
 def generateSecretRule():
-    global attributes
-    secret_rule = []
-
-    for i in attributes:
-        attr = attributes[i][random.randint(0,len(attributes[i])-1)]
-        secret_rule.append(attr)
-    
+    # iterates through attributes dictionary and appends a random value from the indexed element in attributes to secret_rule
+    secret_rule = [attributes[i][random.randint(0,len(attributes[i])-1)] for i in attributes]
     return secret_rule
