@@ -8,8 +8,9 @@ Dependencies: None
 scrx, scry = 720, 480           # window size
 center = (scrx/2,scry/2)        # calculated center of the screen
 
-name = 'KNB'                    # default name 
-inp = [0,0,0,0,0]               # input cursor
+name = 'KNB'                    # default name (must be a three letters only)
+inp = [0,0,0,0]               # input cursor
+# inp format: inp = [player grid cursor x, player grid cursor y / amount, piece color, piece shape]
 
 correct_verifies = False        # verify pass
 wins = 0                        # number of wins

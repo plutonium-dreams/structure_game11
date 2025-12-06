@@ -58,7 +58,7 @@ class Guess(Window):
         Guess Function
         Description: Backend for the guessing mechanic. Takes the list inp as user input and uses specific list elements (that can be modified by keyboard input) to determine the amount and shape that the player wishes to input for their guess. This information is then used to render the amount and shape from the window surface.
         '''
-        self.number = attributes['quantity'][-inp[1] % len(attributes)]
+        self.number = attributes['quantity'][-inp[1] % len(attributes['quantity'])]
         self.shape = Shape(attributes['color'][(inp[2]) % 3], attributes['shape'][(inp[3]) % 2])
 
         self.window.blit(self.image, (-10,-10))

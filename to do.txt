@@ -1,4 +1,13 @@
 To do list:
+Remaining:
+[ ] guess button image
+[ ] music for the game
+[ ] defense PPT
+    [ ] defense practice (on monday and tuesday)
+[ ] readme file
+[ ] game manual
+[ ] game exe
+
 
 1. game
 To do list:
@@ -30,8 +39,8 @@ To do list:
 [/] add the graphics
 
 2. Make the documentation
-[ ] main.py
-[ ] grid.py
+[/] main.py
+[/] grid.py
 [/] shape.py
 [/] rule.py
 [/] window.py
@@ -40,8 +49,8 @@ To do list:
 
 
 3. Make the assets of the following:
-[ ] Background of Title screen
-[ ] Back ground of the game
+[/] Background of Title screen
+[/] Back ground of the game
 [ ] Music for the game
     [ ] times up
     [ ] correct guess
@@ -50,23 +59,18 @@ To do list:
     [ ] invalid structure
     [ ] start game
     [ ] new high score
-[ ] Shapes
+[/] Shapes
 [ ] Buttons
-[ ] Text
-[ ] Title screen
-[ ] Highscores board
+    [/] start
+    [/] pause Buttons
+    [/] timer Buttons
+    [/] leaderboard buttons
+    [ ] guess button
+[/] Text
+[/] Title screen
+[/] Highscores board
 
 
-3. Game manual
+3. Game manual [ ]
 
-4. PPT
-
-
-What to finish today:
-- Final project progress report
-- Assets of the Shapes
-- Button assets
-- Playtesting
-
-
-
+4. PPT [ ]

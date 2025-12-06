@@ -86,7 +86,7 @@ def newGame():
         return newGame()
 
 
-    # For debugging purposes:
+    # For debugging purposes (prints out in the terminal the secret rule as well as the computer grids in text form):
     # print(f'Secret Rule: {secret_rule}')
     # print()
     # print(grid_1)
@@ -144,7 +144,7 @@ def start():
         start_button.update()
         if start_button.status:
             start_button.status = False
-            name = highscore.savename()
+            name = highscore.saveName()
             return game()
 
         # timber button functionality
@@ -222,6 +222,7 @@ def game():
     # call new game to initialize a new board
     newGame()
     
+    # game loop for the actual gameplay screen
     while True:
         ''' rendering '''
         bg = pygame.image.load(os.path.join('assets', 'images', f'bg{bg_num}.png')).convert()       # background image loaded here so that it can change every time a correct guess is made.
@@ -232,46 +233,43 @@ def game():
         if timer_button.status:
             timer.render(window)
         
-        
+        # renders the computer grids and their corresponding markers
         grid_1.render(window)
         grid_2.render(window)
-        # pygame.draw.circle(window, 'black', center, 5)
-        pygame.draw.circle(window, 'black', (scrx/4-128-16, 128), 32)
-        pygame.draw.circle(window, 'white', (3 * scrx/4 + 128 + 16, 128), 32)
-        pygame.draw.rect(window, 'white', ((scrx/4-128-16, 128), (64, 64)))
-
-        # player area
-        player.render(window)
+        pygame.draw.aacircle(window, 'white', (scrx/4-128-12, 128), 35)
+        pygame.draw.aacircle(window, 'black', (3 * scrx/4 + 128 + 8, 128), 35)
+        pygame.draw.aacircle(window, 'black', (scrx/4-128-12, 128), 32)
+        pygame.draw.aacircle(window, 'white', (3 * scrx/4 + 128 + 8, 128), 32)
         
-        guess_button.render(window, correct_verifies)
-
-        window.blit(dashboard, (scrx-128-96-16, scry - (scry/4)-96-16))
-
-        # hand
-        hand.render(window, (scrx-128-32, scry - (scry/4)+16))
-
-        window.blit(wintext.render(f'{wins}', 0, 'black'),(scrx-96, scry - (scry/4)-64-8))
+        # renders the various amenities that the player has
+        player.render(window)       # player grid
+        guess_button.render(window, correct_verifies)       # guess button
+        window.blit(dashboard, (scrx-128-96-16, scry - (scry/4)-96-16))     # dashboard
+        hand.render(window, (scrx-128-32, scry - (scry/4)+16))      # dashboard (hand part)
+        window.blit(wintext.render(f'{wins}', 0, 'black'),(scrx-96, scry - (scry/4)-64-8))      # dashboard (number of points)
 
 
         ''' logic '''
+        # if the timer is present and it is empty, save the score and go back to the start screen
+        if timer_button.status and timer.duration <= 0:
+            pygame.mixer.music.stop()
+            highscore.saveHighscore(name, wins)
+            return start()
+        
+        # only allows updating of the player grid and player hand if the guess window and pause window is not up
         if not (guess_button.status and correct_verifies) and not paused:
             player.playerUpdate(window, inp)
             hand = Shape(attributes['color'][inp[2] % 3], attributes['shape'][inp[3] % 2])
 
-        if correct_verifies:        # only when the player has a valid structure that they can click the guess button
+        # only when the player has a valid structure that they can click the guess button
+        if correct_verifies:        
             guess_button.update()
 
-        # timer
-        if timer_button.status and timer.duration <= 0:
-            pygame.mixer.music.stop()
-            highscore.save_highscore(name, wins)
-            return start()
-
-        # clicking on the guess button will bring up the guess menu
+        # clicking on the (clickable) guess button will bring up the guess menu
         if guess_button.status and correct_verifies:
             gss = guess_window.guess(window, inp)
             
-        # pausing
+        # display the pause menu if the player chooses to pause
         if paused:
             pause_value = pause_window.pause(window)
             timer.velocity = 0
@@ -281,30 +279,35 @@ def game():
                 return start()
             if pause_value == 2:
                 paused = False
+        # if paused, stop the timer, if not, continue
         else:
             timer.velocity = wins * 0.1 + 0.1
 
 
         ''' event handling '''
+        
         for event in pygame.event.get():
+            # exits the game if the player presses the close button on the program's title bar
             if event.type == pygame.QUIT:
                 pygame.quit()   
                 sys.exit()
 
             # mouse input handling
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if guess_button.status:
+                # guess button functionality. if guess window is down, opens the guess window
+                if guess_button.status:     # closes guess window
                     correct_verifies = False
                     guess_button.status = False
-                if not guess_button.status and correct_verifies:
+                elif not guess_button.status and correct_verifies and guess_button.rect.collidepoint(pygame.mouse.get_pos()):     # sets the player grid cursor x and y to 0 if the player opens the guess window via mouse
                     inp[0], inp[1] = 0,0
+                    pass
 
             # keyboard input handling
             if event.type == pygame.KEYDOWN:
                 if not paused:
+                    # for moving the cursor on the player grid, as well as modifying the amount on the guess window for the case of W and S
                     if event.key == pygame.K_w:
                         inp[1] -= 1
-                        
                     if event.key == pygame.K_s:
                         inp[1] += 1
                     if event.key == pygame.K_d:
@@ -314,17 +317,21 @@ def game():
                     
                     # for placing a piece; and not draw_guess for all these
                     if event.key == pygame.K_SPACE:
-                        if not guess_button.status:
+                        if not guess_button.status:     # only place a piece on the player grid if guess button screen is not up
                             player.place(hand.color, hand.type)
+                    # modifies the color (inp[2]) and shape (inp[3]) of the hand as well as the piece in the guess menu
                     if event.key == pygame.K_j:
                         inp[2] += 1
                     if event.key == pygame.K_k:
                         inp[3] += 1
+
                     if event.key == pygame.K_RETURN:
+                        # verifies if the player grid follows the secret rule
                         if not guess_button.status:
                             if player.checkGrid(secret_rule):
                                 correct_verifies = True
                         
+                        # checks if the guess for the secret rule is correct. if so, setup for a new game.
                         if guess_button.status:
                             if gss == secret_rule:
                                 wins += 1
@@ -333,20 +340,22 @@ def game():
                                 timer.reset()
                                 player.clear()
                                 
+                                # only change backgrounds if timer is up
                                 if not timer_button.status:
                                     bg_num = random.randint(1,3)
 
                                 newGame()
                                 
-                            
                             correct_verifies = False
                             guess_button.status = False
                         
                     if event.key == pygame.K_BACKSPACE:
+                        # clears the player grid
                         if not guess_button.status:
                             player.clear()
 
                     if event.key == pygame.K_TAB:
+                        # opens the guess window if not open; closes if it is
                         if not guess_button.status and correct_verifies:
                             inp[0], inp[1] = 0,0
                             guess_button.status = True
@@ -355,6 +364,7 @@ def game():
                             guess_button.status = False
 
                 if event.key == pygame.K_ESCAPE:
+                    # opens the pause window if not open; closes if it is
                     if not paused:
                         paused = True
                     else:

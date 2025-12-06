@@ -165,14 +165,14 @@ class Highscore():
 
         # print(self.state)
     
-    def sort_s(self, e):      # for sorting the high scores
+    def sortS(self, e):      # for sorting the high scores
         '''
         sort_s method
         Description: A "lemma" function used in the sort_highscores method. This allows for the sorting of the highscores using the score itself.
         '''
         return e[3:e.find('\n')]
 
-    def sort_highscores(self):
+    def sortHighscores(self):
         '''
         sort_highscores method
         Description: This method sorts the highscores and returning a new sorted highscores list. This sorting is done by digit place.
@@ -184,11 +184,11 @@ class Highscore():
         for score in self.highscores:       # 10s
             if 10 <= int(score[4:score.find('\n')]) < 100:
                 sort.append(score)
-            self.highscores.sort(reverse=True, key=self.sort_s)
+            self.highscores.sort(reverse=True, key=self.sortS)
         for score in self.highscores:       # 1s
             if 1 <= int(score[4:score.find('\n')]) < 10:
                 sort.append(score)
-            self.highscores.sort(reverse=True, key=self.sort_s)
+            self.highscores.sort(reverse=True, key=self.sortS)
         return sort
 
     def render(self, surf):
@@ -206,13 +206,13 @@ class Highscore():
 
         for i in range(5):
             try:
-                score = nametext.render(self.sort_highscores()[i], 0, 'black')
+                score = nametext.render(self.sortHighscores()[i], 0, 'black')
             except IndexError:
                 score = nametext.render('-------', 0, 'black')
             surf.blit(score, (self.pos[0]+64, (self.pos[1]-234) + 32*i))
 
 
-    def save_highscore(self, name, wins):
+    def saveHighscore(self, name, wins):
         '''
         save_highscore method
         Description: Saves the player's specified name and number of points accumulated in the highscore text file with a specific string format.
@@ -220,7 +220,7 @@ class Highscore():
         with open(os.path.join('data', 'highscores.txt'), 'a') as highscores_file:
             highscores_file.write(f'{name}:{wins}\n')
 
-    def savename(self):
+    def saveName(self):
         '''
         savename method
         Description: Saves the inputted name in the name input area of the leaderboards. It converts the triple of integers from the state list into characters and returns the new string as the player's specified name.
