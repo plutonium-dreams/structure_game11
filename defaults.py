@@ -1,16 +1,18 @@
 '''
 Defaults module
-to compile all the default stuff into one file
+
+Overview: This module compiles all of the default variables required by many of the python scripts. Essentially, this acts as a "bank" for variables that have no dependency and are required by several modules. This also serves to declutter the main module.
+
+Dependencies: None
 '''
-scrx, scry = 720, 480
-# scrx, scry = 1080, 720
-center = (scrx/2,scry/2)
+scrx, scry = 720, 480           # window size
+center = (scrx/2,scry/2)        # calculated center of the screen
 
-name = 'KNB'
-highscore = []
+name = 'KNB'                    # default name 
+inp = [0,0,0,0,0]               # input cursor
 
-inp = [0,0,0,0,0]     # input cursor
-correct_verifies = False    # verify pass
-wins = 0    # number of wins
-draw_guess = False      # guessing screen status
-paused = False          # pause screen status
+correct_verifies = False        # verify pass
+wins = 0                        # number of wins
+
+draw_guess = False              # guessing screen status
+paused = False                  # pause screen status

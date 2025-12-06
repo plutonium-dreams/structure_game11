@@ -1,13 +1,12 @@
 '''
 Shapes module
 
-Overview
+Overview: This module intends to host the functionality for shapes. It contains the shape class which, in turn, contains a shape class method for rendering the shape.
 
-Dependencies
+Dependencies: pygame, os, random
 
 
 '''
-
 import pygame, os, random
 
 pygame.init()
@@ -18,11 +17,10 @@ class Shape():
     Description: Holds functions responsible grabbing specific shapes, color and type, from the game assets
     and rendering them on the grids. 
     '''
-
-    # function for loading specific shape images from the game assets and scaling them
     def __init__(self, color, tipe):
         '''
         Initializes the class
+        Description: Loads the shape's image based on its color and type and scales them to 64x64.
         '''
         self.color = color
         self.type = tipe
@@ -31,10 +29,9 @@ class Shape():
 
         self.pos = (0,0)
 
-    # function rendering a shape, based on the class, on a set position on a surface
     def render(self, surf, pos):
         '''
-        Class method for rendering the shape class instance
+        Renders the shape class instance with a specified surface and position.
         '''
         self.pos = pos
         surf.blit(self.image, self.pos)
