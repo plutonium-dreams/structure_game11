@@ -26,6 +26,22 @@ if not os.path.exists(os.path.join('data', 'highscores.txt')):
     highscores_file = open(os.path.join('data', 'highscores.txt'), 'r')
     highscores_file.close()
 
+# initializes the game's sounds
+pygame.mixer.init()
+start_game_sound = pygame.Sound(os.path.join('assets', 'audios', 'start_game.mp3'))
+end_game_sound = pygame.Sound(os.path.join('assets', 'audios', 'end_game.mp3'))
+button_sound = pygame.Sound(os.path.join('assets', 'audios', 'button_sound.mp3'))
+select_sound = pygame.Sound(os.path.join('assets', 'audios', 'select_sound.mp3'))
+valid_board_sound = pygame.Sound(os.path.join('assets', 'audios', 'valid_board.mp3'))
+invalid_board_sound = pygame.Sound(os.path.join('assets', 'audios', 'invalid_board.mp3'))
+correct_guess_sound = pygame.Sound(os.path.join('assets', 'audios', 'correct_guess.mp3'))
+wrong_guess_sound = pygame.Sound(os.path.join('assets', 'audios', 'wrong_guess.mp3'))
+
+channel_1 = pygame.Channel(1)
+channel_2 = pygame.Channel(2)
+
+channel_1.set_volume(0.4)
+channel_2.set_volume(0.4)
 
 class Button():
     '''
@@ -47,6 +63,8 @@ class Button():
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.pos
 
+        self.sound = button_sound
+
     def update(self):
         '''
         Update Method
@@ -54,8 +72,10 @@ class Button():
         '''
         if self.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_just_pressed()[0]:
             if not self.status:
+                channel_1.play(self.sound)
                 self.status = True
             else:
+                channel_1.play(self.sound)
                 self.status = False
 
     def render(self, surf, clickable):
@@ -230,3 +250,32 @@ class Highscore():
             name += chr(i)
         
         return name
+
+class Music():
+    '''
+    Music Class
+    Description: A class specifically made for handling the music of the game (not the sound effects). This is so that it is easy to modify the settings regarding the music used in the game.
+    '''
+    def __init__(self, mode):
+        pygame.mixer.init()
+        self.mode = mode
+        self.tracklist = []
+        # loads two songs based on the mode into the tracklist
+        for i in range(1,3):
+            self.tracklist.append(f'{self.mode}{i}.mp3')
+        pygame.mixer.music.set_volume(0.7)
+
+    def update(self):
+        # plays a random song from the tracklist and queues a 5 second silence to be played after every song
+        pygame.mixer.music.load(os.path.join('assets', 'audios', 'music', f'{self.tracklist[random.randint(0, len(self.tracklist)-1)]}'))
+        pygame.mixer.music.play()
+        pygame.mixer.music.queue(os.path.join('assets', 'audios', 'silence.mp3'))
+        
+        
+        
+        
+        
+    
+        
+        
+

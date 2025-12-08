@@ -122,10 +122,15 @@ class Grid:
         Overview: Generates the grid instance's grid.
         '''
         self.clear()
+        snum = [0,0]
 
         # for 9 times, we update a random cell on the grid with the a randomly generated item of the form ['color', 'attribute']
         for i in range(len(self.grid)):
             shp = random.randint(0,1)
+
+            # makes sure that the amount of shapes of one color drawn is not more than the maximum quantity specifed in the attributes dictionary
+            if snum[shp] > max(attributes['quantity']):
+                continue
 
             self.update(random.randint(0,8), [attributes['color'][random.randint(0,2)], attributes['shape'][shp]])
                 

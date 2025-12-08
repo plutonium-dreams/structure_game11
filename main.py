@@ -1,5 +1,5 @@
 '''
-ARKITEK
+ARKI
 
 Group Mayad's Final Project for Math 153
     Kent Nico Balondro
@@ -42,6 +42,7 @@ window = pygame.display.set_mode((scrx, scry))
 pygame.clock = pygame.time.Clock()
 pygame.display.set_caption('ARKI GAME')
 
+
 # initializes the class instances for the timer, guess window, pause window, and the player's hand
 timer = Timer((0, center[1]-32))                        
 guess_window = Guess((scrx/4, scry/4), (360,240))       
@@ -49,7 +50,7 @@ pause_window = Pause((25, 25), (scrx * 7/8 + 32, scry * 7/8))
 hand = Shape(attributes['color'][0], attributes['shape'][0]) 
 
 # initializes buttons for guess, start, and timer
-guess_button = Button((64, scry - (scry/4)-32), 'button.png', (128, 64))
+guess_button = Button((64, scry - (scry/4)-32), 'guess_button.png', (128, 64))
 start_button = Button((center[0]-128-32, center[1]+128), 'start_button.png', (160, 80))
 timer_button = Button((center[0]-256-48, center[1]+128), 'timer_button.png', (256*0.4, 186*0.4))
 
@@ -118,15 +119,15 @@ def start():
 
     start_bg = pygame.image.load(os.path.join('assets', 'images', 'start_bg.png'))
     start_bg = pygame.transform.scale_by(start_bg, 2)
-    start_bg = pygame.transform.hsl(start_bg, 160, -0.5, 0)
+    start_bg = pygame.transform.hsl(start_bg, random.randint(-360,360), -0.5, 0)
 
     paperclips = pygame.image.load(os.path.join('assets', 'images', 'paperclips.png'))
     paperclips = pygame.transform.rotozoom(paperclips, 90, 1.2)
-    paperclips = pygame.transform.invert(paperclips)
-
+    paperclips = pygame.transform.invert(paperclips)    
 
     # game loop for the start screen
     while True:
+        
         ''' Rendering '''
         window.fill(('gray'))
         window.blit(start_bg, (-15,-15))
@@ -145,6 +146,8 @@ def start():
         if start_button.status:
             start_button.status = False
             name = highscore.saveName()
+            channel_2.stop()
+            channel_1.play(start_game_sound)
             return game()
 
         # timber button functionality
@@ -159,11 +162,6 @@ def start():
             if event.type == pygame.QUIT:       # exits the game if the player presses the close button on the program's title bar
                 pygame.quit()   
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:    # starts the game if the player presses enter
-                    start_button.status = False
-                    name = highscore.savename()
-                    return game()
 
 
         ''' Pygame Backend '''
@@ -210,14 +208,16 @@ def game():
     dashboard = pygame.transform.scale_by(dashboard, 1)
     
 
-    # initialize the audio
-    if timer_button.status:         # arcade mode
-        pygame.mixer.music.load(os.path.join('assets', 'audios', 'bop.mp3'))
-    else:                           # zen mode
-        pygame.mixer.music.load(os.path.join('assets', 'audios', 'soothe.mp3'))
+    muse = Music('arcade' if timer_button.status else 'zen')
 
-    pygame.mixer.music.play()
-    pygame.mixer.music.set_volume(0.1)
+    # initialize the audio
+    # if timer_button.status:         # arcade mode
+    #     pygame.mixer.music.load(os.path.join('assets', 'audios', 'bop.mp3'))
+    # else:                           # zen mode
+    #     pygame.mixer.music.load(os.path.join('assets', 'audios', 'soothe.mp3'))
+
+    # pygame.mixer.music.play()
+    # pygame.mixer.music.set_volume(0.1)
     
     # call new game to initialize a new board
     newGame()
@@ -254,6 +254,7 @@ def game():
         if timer_button.status and timer.duration <= 0:
             pygame.mixer.music.stop()
             highscore.saveHighscore(name, wins)
+            channel_2.play(end_game_sound)
             return start()
         
         # only allows updating of the player grid and player hand if the guess window and pause window is not up
@@ -275,6 +276,7 @@ def game():
             timer.velocity = 0
             if pause_value == 1:
                 pygame.mixer.music.stop()
+                channel_2.play(end_game_sound)
                 paused = False
                 return start()
             if pause_value == 2:
@@ -283,6 +285,8 @@ def game():
         else:
             timer.velocity = wins * 0.1 + 0.1
 
+        if not pygame.mixer.music.get_busy():
+            muse.update()
 
         ''' event handling '''
         
@@ -308,8 +312,12 @@ def game():
                     # for moving the cursor on the player grid, as well as modifying the amount on the guess window for the case of W and S
                     if event.key == pygame.K_w:
                         inp[1] -= 1
+                        # if guess_button.status:
+                        #     channel_1.play(select_sound)
                     if event.key == pygame.K_s:
                         inp[1] += 1
+                        # if guess_button.status:
+                        #     channel_1.play(select_sound)
                     if event.key == pygame.K_d:
                         inp[0] += 1
                     if event.key == pygame.K_a:
@@ -322,14 +330,21 @@ def game():
                     # modifies the color (inp[2]) and shape (inp[3]) of the hand as well as the piece in the guess menu
                     if event.key == pygame.K_j:
                         inp[2] += 1
+                        # if guess_button.status:
+                        #     channel_1.play(select_sound)
                     if event.key == pygame.K_k:
                         inp[3] += 1
+                        # if guess_button.status:
+                        #     channel_1.play(select_sound)
 
                     if event.key == pygame.K_RETURN:
                         # verifies if the player grid follows the secret rule
                         if not guess_button.status:
-                            if player.checkGrid(secret_rule):
+                            if player.checkGrid(secret_rule) and not correct_verifies:
+                                channel_1.play(valid_board_sound)
                                 correct_verifies = True
+                            else:
+                                channel_1.play(invalid_board_sound)
                         
                         # checks if the guess for the secret rule is correct. if so, setup for a new game.
                         if guess_button.status:
@@ -339,12 +354,14 @@ def game():
                                 timer.velocity += 0.1
                                 timer.reset()
                                 player.clear()
-                                
                                 # only change backgrounds if timer is up
                                 if not timer_button.status:
                                     bg_num = random.randint(1,3)
+                                channel_1.play(correct_guess_sound)
 
                                 newGame()
+                            else:
+                                channel_1.play(wrong_guess_sound)
                                 
                             correct_verifies = False
                             guess_button.status = False
@@ -357,6 +374,7 @@ def game():
                     if event.key == pygame.K_TAB:
                         # opens the guess window if not open; closes if it is
                         if not guess_button.status and correct_verifies:
+                            channel_1.play(button_sound)
                             inp[0], inp[1] = 0,0
                             guess_button.status = True
                         else:
