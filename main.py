@@ -355,7 +355,7 @@ def game():
                                 timer.reset()
                                 player.clear()
                                 # only change backgrounds if timer is up
-                                if not timer_button.status:
+                                if timer_button.status:
                                     bg_num = random.randint(1,3)
                                 channel_1.play(correct_guess_sound)
 

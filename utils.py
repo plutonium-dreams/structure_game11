@@ -9,7 +9,6 @@ Dependencies: pygame, os, defaults, rule, grid
 
 import pygame, os, random
 from defaults import *
-from rule import *
 from grid import *
 
 pygame.init()
@@ -40,7 +39,7 @@ wrong_guess_sound = pygame.Sound(os.path.join('assets', 'audios', 'wrong_guess.m
 channel_1 = pygame.Channel(1)
 channel_2 = pygame.Channel(2)
 
-channel_1.set_volume(0.4)
+channel_1.set_volume(0.5)
 channel_2.set_volume(0.4)
 
 class Button():
@@ -257,6 +256,10 @@ class Music():
     Description: A class specifically made for handling the music of the game (not the sound effects). This is so that it is easy to modify the settings regarding the music used in the game.
     '''
     def __init__(self, mode):
+        '''
+        Initializes the Music class instance
+        Description: The instance loads 2 songs into the tracklist based on the mode given (be it arcade or zen) and sets the music volume to 70%
+        '''
         pygame.mixer.init()
         self.mode = mode
         self.tracklist = []
@@ -266,7 +269,10 @@ class Music():
         pygame.mixer.music.set_volume(0.7)
 
     def update(self):
-        # plays a random song from the tracklist and queues a 5 second silence to be played after every song
+        '''
+        Update Method
+        Description: loads a random song from the tracklist, plays it, and queues a 5 second silence to be played after every song
+        '''
         pygame.mixer.music.load(os.path.join('assets', 'audios', 'music', f'{self.tracklist[random.randint(0, len(self.tracklist)-1)]}'))
         pygame.mixer.music.play()
         pygame.mixer.music.queue(os.path.join('assets', 'audios', 'silence.mp3'))

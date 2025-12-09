@@ -122,17 +122,24 @@ class Grid:
         Overview: Generates the grid instance's grid.
         '''
         self.clear()
-        snum = [0,0]
-
+        # this dictionary serves as a counter for how many shapes of a color have been drawn. 
+        shape_qty = {
+            0: [0,0,0],
+            1: [0,0,0] 
+            }
         # for 9 times, we update a random cell on the grid with the a randomly generated item of the form ['color', 'attribute']
         for i in range(len(self.grid)):
+            # randomly choose a shape and color
             shp = random.randint(0,1)
-
+            clr = random.randint(0,2)
+            
             # makes sure that the amount of shapes of one color drawn is not more than the maximum quantity specifed in the attributes dictionary
-            if snum[shp] > max(attributes['quantity']):
+            if shape_qty[shp][clr] > max(attributes['quantity']) - 1:
                 continue
 
-            self.update(random.randint(0,8), [attributes['color'][random.randint(0,2)], attributes['shape'][shp]])
+            # if maximum has not yet been reached, try to place the piece on the board and if successful, add one to its counter
+            if self.update(random.randint(0,8), [attributes['color'][clr], attributes['shape'][shp]]):
+                shape_qty[shp][clr] += 1
                 
             # grid element
             # ['color', 'shape']

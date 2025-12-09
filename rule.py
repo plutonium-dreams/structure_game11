@@ -20,7 +20,7 @@ attributes = {
     'color': ['red','yellow','blue'],
     'shape': ['square','triangle'],
 }
-# a note on quantity: highest quantity number is 4 otherwise max recursion depth is reached. can also add 0 for a challenge.
+# a note on quantity: highest quantity number is 4 otherwise max recursion depth is reached. can also add 0 for a challenge but dont have quantity 0 alone.
 
 def generateSecretRule():
     '''

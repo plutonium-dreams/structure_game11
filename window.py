@@ -8,8 +8,6 @@ Dependencies: pygame, os, math, utils, shape, rule
 '''
 import pygame, os, math
 from utils import *
-from shape import *
-from rule import *
 
 pygame.init()
 
