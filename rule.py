@@ -13,14 +13,19 @@ import random
 '''
     Attributes Dictionary
     Description: Container of all possible quantities, colors, and shapes that can be used to build up the secret rule. 
-    One can utilize the dictionary to create a custom secret ruleset for their game.
+    One can utilize the dictionary to create a custom secret ruleset for their game. Only be mindful that adding too many of an attribute might cause the program to have a recursion depth error due to a narrower search.
+
+    Possible Attributes:
+    quantity: [0,1,2,3,4]
+    color: red, blue, yellow, green, orange, violet
+    shape: square, triangle, circle
 '''
 attributes = {
     'quantity': [1,2,3],
-    'color': ['red','yellow','blue'],
+    'color': ['red', 'blue', 'yellow'],
     'shape': ['square','triangle'],
 }
-# a note on quantity: highest quantity number is 4 otherwise max recursion depth is reached. can also add 0 for a challenge but dont have quantity 0 alone.
+
 
 def generateSecretRule():
     '''

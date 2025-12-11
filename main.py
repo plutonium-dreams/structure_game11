@@ -260,7 +260,7 @@ def game():
         # only allows updating of the player grid and player hand if the guess window and pause window is not up
         if not (guess_button.status and correct_verifies) and not paused:
             player.playerUpdate(window, inp)
-            hand = Shape(attributes['color'][inp[2] % 3], attributes['shape'][inp[3] % 2])
+            hand = Shape(attributes['color'][inp[2] % len(attributes['color'])], attributes['shape'][inp[3] % len(attributes['shape'])])
 
         # only when the player has a valid structure that they can click the guess button
         if correct_verifies:        

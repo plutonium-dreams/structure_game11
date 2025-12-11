@@ -124,14 +124,15 @@ class Grid:
         self.clear()
         # this dictionary serves as a counter for how many shapes of a color have been drawn. 
         shape_qty = {
-            0: [0,0,0],
-            1: [0,0,0] 
+            0: [0,0,0,0,0,0],
+            1: [0,0,0,0,0,0],
+            2: [0,0,0,0,0,0]
             }
         # for 9 times, we update a random cell on the grid with the a randomly generated item of the form ['color', 'attribute']
         for i in range(len(self.grid)):
             # randomly choose a shape and color
-            shp = random.randint(0,1)
-            clr = random.randint(0,2)
+            shp = random.randint(0,len(attributes['shape'])-1)
+            clr = random.randint(0,len(attributes['color']) - 1)
             
             # makes sure that the amount of shapes of one color drawn is not more than the maximum quantity specifed in the attributes dictionary
             if shape_qty[shp][clr] > max(attributes['quantity']) - 1:
