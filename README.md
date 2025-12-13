@@ -5,22 +5,24 @@ A Zendo-inspired puzzle game made with Python using the Pygame module in 2 weeks
 
 ## Credits
 - Code, graphics, and sound effects by Group Mayad
-- Music by Totomori
+- Music by Totomori (https://www.youtube.com/@tottomori)
     - Songs from Sproutpop and Shoreline mistward albums
 
 
 ## Requirements
-- pygame-ce module
+- pygame-ce module (note that this is the community edition)
+	- see the quick start section of https://pyga.me/docs/ for reference
+- check for new updates at the github repository: https://github.com/plutonium-dreams/structure_game11
 
 
 ## Controls
-WASD - up down left right
-J - cycle through the colors
-K - cycle through the shapes
-SPACE - place piece
-ENTER - verify structure
-ESCAPE - go back to main menu
-TAB or click green button to put in guess
+- WASD - up down left right
+- J - cycle through the colors
+- K - cycle through the shapes
+- SPACE - place piece
+- ENTER - verify structure
+- ESCAPE - go back to main menu
+- TAB or click green button to put in guess
 
 
 ## How to Play
